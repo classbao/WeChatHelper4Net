@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A298D0C0-0C26-4BE7-AB4B-C8432D394CED}</ProjectGuid>
+    <ProjectGuid>{390EF549-9009-4CEA-885A-8D33F40B0807}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WeChatHelper4Net</RootNamespace>
     <AssemblyName>WeChatHelper4Net</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,6 +32,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,7 +42,73 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessToken.cs" />
+    <Compile Include="CacheHelper.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="CustomService\SendMsg.cs" />
+    <Compile Include="Extend\ConfigHelper.cs" />
+    <Compile Include="Extend\DictionaryExtend.cs" />
+    <Compile Include="Extend\RandomCode.cs" />
+    <Compile Include="Extend\StringHelper.cs" />
+    <Compile Include="GlobalFlag.cs" />
+    <Compile Include="HttpRequestHelper.cs" />
+    <Compile Include="JsonHelper.cs" />
+    <Compile Include="JSSDK.cs" />
+    <Compile Include="LogHelper.cs" />
+    <Compile Include="Map\BaiduMap.cs" />
+    <Compile Include="Map\BaiduMapModel.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Models\AccessTokenModel.cs" />
+    <Compile Include="Models\BonusModel.cs" />
+    <Compile Include="Models\CustomService\Base\Base.cs" />
+    <Compile Include="Models\CustomService\Base\Element.cs" />
+    <Compile Include="Models\CustomService\kfMsgModel.cs" />
+    <Compile Include="Models\CustomService\MsgModel.cs" />
+    <Compile Include="Models\EnumType.cs" />
+    <Compile Include="Models\GroupModel.cs" />
+    <Compile Include="Models\JSSDKConfig.cs" />
+    <Compile Include="Models\Menu\Base\Base.cs" />
+    <Compile Include="Models\Menu\Base\Element.cs" />
+    <Compile Include="Models\Menu\MenuModel.cs" />
+    <Compile Include="Models\MicroMessengerUserAgent.cs" />
+    <Compile Include="Models\NewsModel.cs" />
+    <Compile Include="Models\PassiveReplyModel.cs" />
+    <Compile Include="Models\PayModel.cs" />
+    <Compile Include="Models\ReceivedMsgModel.cs" />
+    <Compile Include="Models\RequestResultBaseModel.cs" />
+    <Compile Include="Models\TemplateMessage\ActivitiesJoinNotice.cs" />
+    <Compile Include="Models\TemplateMessage\ActivityParticipantsReminder.cs" />
+    <Compile Include="Models\TemplateMessage\Base.cs" />
+    <Compile Include="Models\TemplateMessage\CustomerMessageNotice.cs" />
+    <Compile Include="Models\TemplateMessage\DynamicNotice.cs" />
+    <Compile Include="Models\TemplateMessage\ExchangeFeedbackNotice.cs" />
+    <Compile Include="Models\TemplateMessage\LotteryResultsNotice.cs" />
+    <Compile Include="Models\TemplateMessage\MeetingReminder.cs" />
+    <Compile Include="Models\TemplateMessage\PapersIncludedNotice.cs" />
+    <Compile Include="Models\TemplateMessage\PaymentSuccess.cs" />
+    <Compile Include="Models\TemplateMessage\ProfessorUpdateNotice.cs" />
+    <Compile Include="Models\TemplateMessage\templatemessage.cs" />
+    <Compile Include="Models\TemplateMessage\Track.cs" />
+    <Compile Include="Models\TemplateMessage\WorkNotice.cs" />
+    <Compile Include="Models\TemplateMessage\WorkRemind.cs" />
+    <Compile Include="Models\TicketModel.cs" />
+    <Compile Include="Models\UserLocationModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Multimedia.cs" />
+    <Compile Include="OAuth.cs" />
+    <Compile Include="OpenWeb\Common.cs" />
+    <Compile Include="OpenWeb\OAuth.cs" />
+    <Compile Include="OpenWeb\Privacy.cs" />
+    <Compile Include="PassiveReply.cs" />
+    <Compile Include="Pay.cs" />
+    <Compile Include="Privacy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReceivingMessage.cs" />
+    <Compile Include="SendMessage.cs" />
+    <Compile Include="Support.cs" />
+    <Compile Include="UserManager.cs" />
+    <Compile Include="ValidationToken.cs" />
+    <Compile Include="XmlHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
