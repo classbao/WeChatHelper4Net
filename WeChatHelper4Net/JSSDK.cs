@@ -6,7 +6,6 @@ using System.Data.SqlClient;
 
 using WeChatHelper4Net.Extend;
 using WeChatHelper4Net.Models;
-using chinahxmedia.BLL;
 
 /*
  * 微信公众账号API（微信JS-SDK）
@@ -66,7 +65,7 @@ namespace WeChatHelper4Net
         {
             try
             {
-                var ticket = BLLRepository.wxtokenBLL.LoadByName("JSApiTicket", Privacy.AppId);
+                var ticket = chinahxmedia.BLL.BLLRepository.wxtokenBLL.LoadByName("JSApiTicket", Privacy.AppId);
                 if (null != ticket && !string.IsNullOrWhiteSpace(ticket.token))
                 {
                     JSApiTicketCacheModel ticketModel = new JSApiTicketCacheModel();
@@ -101,7 +100,7 @@ namespace WeChatHelper4Net
                     creationtime = DateTime.Now
                 };
 
-                return BLLRepository.wxtokenBLL.UpdateByName("JSApiTicket", Privacy.AppId, wxtoken, TimeSpan.FromSeconds(ticket.expires_in));
+                return chinahxmedia.BLL.BLLRepository.wxtokenBLL.UpdateByName("JSApiTicket", Privacy.AppId, wxtoken, TimeSpan.FromSeconds(ticket.expires_in));
             }
             catch (Exception Ex)
             {

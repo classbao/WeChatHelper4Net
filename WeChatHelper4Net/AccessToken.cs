@@ -1,5 +1,4 @@
-﻿using chinahxmedia.BLL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -64,7 +63,7 @@ namespace WeChatHelper4Net
         {
             try
             {
-                var wxtoken = BLLRepository.wxtokenBLL.LoadByName(nameof(AccessToken), Privacy.AppId);
+                var wxtoken = chinahxmedia.BLL.BLLRepository.wxtokenBLL.LoadByName(nameof(AccessToken), Privacy.AppId);
                 if(null != wxtoken && !string.IsNullOrWhiteSpace(wxtoken.token))
                 {
                     AccessTokenCacheModel tokenModel = new AccessTokenCacheModel();
@@ -77,7 +76,7 @@ namespace WeChatHelper4Net
             }
             catch(Exception Ex)
             {
-                LogHelper.Save("AccessToken，" + Ex.Message, nameof(AccessToken), LogType.Error, LogTime.hour);
+                LogHelper.Save("GetAccessTokenFromDB>" + Ex.Message, nameof(AccessToken), LogType.Error, LogTime.hour);
                 CacheHelper.SetCache(keyState, string.Concat("DB Server ", Common.error));
                 //throw Ex;
             }
@@ -99,7 +98,7 @@ namespace WeChatHelper4Net
                     creationtime = DateTime.Now
                 };
 
-                return BLLRepository.wxtokenBLL.UpdateByName(nameof(AccessToken), Privacy.AppId, wxtoken, TimeSpan.FromSeconds(token.expires_in));
+                return chinahxmedia.BLL.BLLRepository.wxtokenBLL.UpdateByName(nameof(AccessToken), Privacy.AppId, wxtoken, TimeSpan.FromSeconds(token.expires_in));
             }
             catch(Exception Ex)
             {

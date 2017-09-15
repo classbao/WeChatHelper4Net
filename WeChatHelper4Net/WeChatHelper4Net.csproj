@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
@@ -109,6 +110,16 @@
     <Compile Include="UserManager.cs" />
     <Compile Include="ValidationToken.cs" />
     <Compile Include="XmlHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\chinahxmedia\src\chinahxmedia.BLL\chinahxmedia.BLL.csproj">
+      <Project>{04a8f083-57c3-44e8-b64c-404e07072523}</Project>
+      <Name>chinahxmedia.BLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\chinahxmedia\src\chinahxmedia.Model\chinahxmedia.Model.csproj">
+      <Project>{e989f86d-7ef6-4114-951f-09cea069d99f}</Project>
+      <Name>chinahxmedia.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
