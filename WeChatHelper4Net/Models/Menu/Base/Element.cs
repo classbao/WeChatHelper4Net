@@ -35,6 +35,30 @@ namespace WeChatHelper4Net.Models.Menu.Base
         public string url { get; set; }
     }
 
+
+    [Serializable]
+    [DataContract]
+    public class MiniProgram : Base
+    {
+        public MiniProgram() { type = "miniprogram"; }
+
+        /// <summary>
+        /// view、miniprogram类型必须	网页链接，用户点击菜单可打开链接，不超过1024字节。type为miniprogram时，不支持小程序的老版本客户端将打开本url。
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public string url { get; set; }
+        /// <summary>
+        /// miniprogram类型必须	小程序的appid（仅认证公众号可配置）
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public string appid { get; set; }
+        /// <summary>
+        /// miniprogram类型必须	小程序的页面路径
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public string pagepath { get; set; }
+    }
+
     [Serializable]
     [DataContract]
     public class Scancode_waitmsg : Base
