@@ -24,10 +24,13 @@ namespace WeChatHelper4Net
         /// <param name="MEDIA_ID">MEDIA_ID</param>
         /// <param name="physicalFolder">物理文件夹</param>
         /// <param name="fileName">保存文件名</param>
+        /// <param name="fileSize">文件大小</param>
         /// <returns>多媒体保存路径</returns>
-        private static string DownloadMultimedia(string ACCESS_TOKEN, string MEDIA_ID, string physicalFolder, string fileName)
+        private static string DownloadMultimedia(string ACCESS_TOKEN, string MEDIA_ID, string physicalFolder, string fileName, out long fileSize)
         {
             //LogHelper.Save("DownloadMultimedia > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，physicalFolder=" + physicalFolder + "，fileName=" + fileName, "DownloadMultimedia", LogType.Common, LogTime.day);
+            fileSize = 0;
+
             string file = string.Empty;
             string content = string.Empty;
             string strpath = string.Empty;
@@ -39,31 +42,31 @@ namespace WeChatHelper4Net
             System.Net.HttpWebRequest req = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(stUrl);
 
             req.Method = "GET";
-            using (System.Net.WebResponse wr = req.GetResponse())
+            using(System.Net.WebResponse wr = req.GetResponse())
             {
                 System.Net.HttpWebResponse myResponse = (System.Net.HttpWebResponse)req.GetResponse();
                 strpath = myResponse.ResponseUri.ToString();
-
+                fileSize = myResponse.ContentLength;
                 string _filename = Common.Replace(myResponse.GetResponseHeader("Content-disposition"), ".*filename=\"", "").Trim(new Char[] { '"' });
                 suffixName = System.IO.Path.GetExtension(_filename).ToLower();
 
                 //LogHelper.Save("接收信息：" + "StatusCode=" + myResponse.StatusCode.ToString() + "，StatusDescription=" + myResponse.StatusDescription + "，ContentType=" + myResponse.ContentType + "，Content-disposition=" + myResponse.GetResponseHeader("Content-disposition") + "，filename=" + _filename + "，suffixName=" + suffixName, "DownloadMultimedia", LogType.Common, LogTime.day);
                 physicalFolder = Common.Replace(physicalFolder, @"[\\\s]+$", "") + "\\";
-                if (!System.IO.Directory.Exists(physicalFolder))
+                if(!System.IO.Directory.Exists(physicalFolder))
                 {
                     try
                     {
                         System.IO.Directory.CreateDirectory(physicalFolder);
                     }
-                    catch (Exception Ex)
+                    catch(Exception Ex)
                     {
                         LogHelper.Save("DownloadMultimedia > 创建文件路径失败！physicalFolder=" + physicalFolder, "DownloadMultimedia", LogType.Common, LogTime.day);
                         throw Ex;
                     }
                 }
-                if (string.IsNullOrWhiteSpace(suffixName))
+                if(string.IsNullOrWhiteSpace(suffixName))
                 {
-                    switch (myResponse.ContentType)
+                    switch(myResponse.ContentType)
                     {
                         case "image/jpeg": suffixName = ".jpg"; break;
                         case "application/x-jpg": suffixName = ".jpg"; break;
@@ -88,7 +91,7 @@ namespace WeChatHelper4Net
                     mywebclient.DownloadFile(strpath, savepath);
                     file = savepath;
                 }
-                catch (Exception Ex)
+                catch(Exception Ex)
                 {
                     savepath = Ex.ToString();
                     throw Ex;
@@ -103,28 +106,30 @@ namespace WeChatHelper4Net
         /// <param name="MEDIA_ID">已上传微信服务器的多媒体ID（多个ID用英文半角逗号分隔）</param>
         /// <param name="physicalFolder">保存目标物理文件夹路径。例如：D:\\UploadFiles\\</param>
         /// <param name="fileName">保存文件名</param>
+        /// <param name="fileSize">文件大小</param>
         /// <param name="now">当前时间对象</param>
         /// <returns>多媒体保存路径（多个ID用英文半角逗号分隔）</returns>
-        public static string DownloadMultimedia(string MEDIA_ID, string physicalFolder, string fileName, DateTime now)
+        public static string DownloadMultimedia(string MEDIA_ID, string physicalFolder, string fileName, out long fileSize, DateTime now)
         {
-            if (string.IsNullOrWhiteSpace(MEDIA_ID)) throw new Exception("必传参数MEDIA_ID不能为空！");
-            if (string.IsNullOrWhiteSpace(physicalFolder)) throw new Exception("保存目标物理文件夹路径physicalFolder不能为空！");
+            fileSize = 0;
+            if(string.IsNullOrWhiteSpace(MEDIA_ID)) throw new Exception("必传参数MEDIA_ID不能为空！");
+            if(string.IsNullOrWhiteSpace(physicalFolder)) throw new Exception("保存目标物理文件夹路径physicalFolder不能为空！");
             MEDIA_ID = Regex.Replace(MEDIA_ID, @"(^[,，\s]+)|([,，\s]+$)", "");
-            if (Regex.IsMatch(MEDIA_ID, @"\s*(,|，)\s*"))
+            if(Regex.IsMatch(MEDIA_ID, @"\s*(,|，)\s*"))
             {
                 StringBuilder result = new StringBuilder();
                 string[] mediaIds = Regex.Split(MEDIA_ID, @"\s*(,|，)\s*");
                 //LogHelper.Save("DownloadMultimedia > MEDIA_ID=" + MEDIA_ID + "；mediaIds.Length=" + mediaIds.Length, "DownloadMultimedia", LogType.Common, LogTime.day);
-                foreach (string mediaId in mediaIds)
+                foreach(string mediaId in mediaIds)
                 {
-                    if (string.IsNullOrWhiteSpace(mediaId) || Regex.IsMatch(mediaId, @"\s*(,|，)\s*"))
+                    if(string.IsNullOrWhiteSpace(mediaId) || Regex.IsMatch(mediaId, @"\s*(,|，)\s*"))
                         continue;
-                    result.AppendFormat("{0},", DownloadMultimedia(AccessToken.GetAccessToken(now), mediaId, physicalFolder, ""));
+                    result.AppendFormat("{0},", DownloadMultimedia(AccessToken.GetAccessToken(now), mediaId, physicalFolder, "", out fileSize));
                 }
                 return Regex.Replace(result.ToString(), @"(^[,，\s]+)|([,，\s]+$)", "").ToString();
             }
             else
-                return DownloadMultimedia(AccessToken.GetAccessToken(now), MEDIA_ID, physicalFolder, fileName);
+                return DownloadMultimedia(AccessToken.GetAccessToken(now), MEDIA_ID, physicalFolder, fileName, out fileSize);
         }
         #endregion
     }
