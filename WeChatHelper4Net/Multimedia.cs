@@ -120,11 +120,21 @@ namespace WeChatHelper4Net
                 StringBuilder result = new StringBuilder();
                 string[] mediaIds = Regex.Split(MEDIA_ID, @"\s*(,|，)\s*");
                 //LogHelper.Save("DownloadMultimedia > MEDIA_ID=" + MEDIA_ID + "；mediaIds.Length=" + mediaIds.Length, "DownloadMultimedia", LogType.Common, LogTime.day);
+
+                int num = 0;
                 foreach(string mediaId in mediaIds)
                 {
                     if(string.IsNullOrWhiteSpace(mediaId) || Regex.IsMatch(mediaId, @"\s*(,|，)\s*"))
                         continue;
-                    result.AppendFormat("{0},", DownloadMultimedia(AccessToken.GetAccessToken(now), mediaId, physicalFolder, "", out fileSize));
+
+                    num++;
+                    string _fileName = string.Empty;
+                    if(!string.IsNullOrWhiteSpace(fileName))
+                    {
+                        _fileName = fileName + num;
+                    }
+
+                    result.AppendFormat("{0},", DownloadMultimedia(AccessToken.GetAccessToken(now), mediaId, physicalFolder, _fileName, out fileSize));
                 }
                 return Regex.Replace(result.ToString(), @"(^[,，\s]+)|([,，\s]+$)", "").ToString();
             }

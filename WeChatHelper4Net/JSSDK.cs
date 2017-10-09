@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using System.Data.SqlClient;
 
 using WeChatHelper4Net.Extend;
 using WeChatHelper4Net.Models;
@@ -35,32 +34,7 @@ namespace WeChatHelper4Net
             }
             return false;
         }
-
-		private static bool UpdateTicketByMemCache(JSApiTicketCacheModel ticket, string key)
-		{
-			bool flag = false;
-			try
-			{
-				//flag = PageUtility.SetMemCacheBool(key, ticket, 40);
-				if (!flag)
-				{
-                    /*
-                    if (!PageUtility.DeleteMemcacheByKey(key))
-                    {
-                        LogHelper.Save("WeChatHelper4Net > JSSDK > GetJSApiTicket()  更新微信数字签名异常！", "AccessToken", LogType.Error, LogTime.minute);
-                        WeChatHelper4Net.SendMessage.TextToUser("o--NRtx58MS4JX9ilO_BV-VjBAGU", "更新微信数字签名异常jsapi_ticket", DateTime.Now);
-                        WeChatHelper4Net.SendMessage.TextToUser("o--NRt9AV2wXeTVl-BLdUzdxtGhQ", "更新微信数字签名异常jsapi_ticket", DateTime.Now);
-                        WeChatHelper4Net.SendMessage.TextToUser("o--NRt5I6jmzBBhIkrOWSqsqXVb4", "更新微信数字签名异常jsapi_ticket", DateTime.Now);
-                    }
-                    */
-                }
-			}
-			catch (Exception Ex)
-			{
-				LogHelper.Save(Ex, "WeChatHelper4Net > AccessToken > UpdateTicketByMemCache()  更新微信数字签名异常！", "AccessToken", LogTime.minute);
-			}
-			return flag;
-		}
+        
         private static JSApiTicketCacheModel GetTicketFromDB()
         {
             try
@@ -109,7 +83,6 @@ namespace WeChatHelper4Net
                 return false;
             }
         }
-
         
         private static string GetJSApiTicket(DateTime now)
         {
@@ -123,19 +96,12 @@ namespace WeChatHelper4Net
                 return ticketModel.ticket;
             //LogHelper.Save("获取jsapi_ticket票据，IISCache结束，没有有效的票据。wxJSApiTicket_IsBusy=" + GlobalFlag.Instance.wxJSApiTicket_IsBusy, nameof(JSSDK), LogType.Report, LogTime.hour);
 
-            //ticketModel = (JSApiTicketXMLModel)PageUtility.GetMemCache(key);
-            //if (CheckTicket(ticketModel, now))
-            //{
-            //	return ticketModel.ticket;
-            //}
-
             //LogHelper.Save("获取jsapi_ticket票据，GetTicketFromDB开始", nameof(JSSDK), LogType.Report, LogTime.hour);
             ticketModel = GetTicketFromDB();
             //LogHelper.Save("获取jsapi_ticket票据，GetTicketFromDB=" + JsonHelper.Serialize(ticketModel), nameof(JSSDK), LogType.Report, LogTime.hour);
             if (CheckTicket(ticketModel, now))
             {
                 CacheHelper.SetCache(key, ticketModel, ticketModel.expires_in / 60);
-                //UpdateTicketByMemCache(ticketModel, key);
                 return ticketModel.ticket;
             }
             //LogHelper.Save("获取jsapi_ticket票据，GetTicketFromDB结束，没有有效的票据。wxJSApiTicket_IsBusy=" + GlobalFlag.Instance.wxJSApiTicket_IsBusy, nameof(JSSDK), LogType.Report, LogTime.hour);
@@ -170,7 +136,6 @@ namespace WeChatHelper4Net
                     try
                     {
                         CacheHelper.SetCache(key, ticketModel, ticketModel.expires_in / 60);
-                        //UpdateTicketByMemCache(ticketModel, key);
                         UpdateTicketToDB(ticketModel);
                     }
                     catch (Exception Ex)

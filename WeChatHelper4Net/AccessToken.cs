@@ -32,33 +32,7 @@ namespace WeChatHelper4Net
             }
             return false;
         }
-
-        private static bool UpdateAccessTokenByMemCache(AccessTokenCacheModel token, string key)
-        {
-            bool flag = false;
-            try
-            {
-                //flag = PageUtility.SetMemCacheBool(key, token, 40);
-                if(!flag)
-                {
-                    /*
-                    if (!PageUtility.DeleteMemcacheByKey(key))
-                    {
-                        LogHelper.Save("WeChatHelper4Net > AccessToken > GetAccessToken()  更新微信数字签名异常！", "AccessToken", LogType.Error, LogTime.minute);
-                        CacheHelper.SetCache(keyState, "MemCache Server error");
-                        WeChatHelper4Net.SendMessage.TextToUser("o--NRtx58MS4JX9ilO_BV-VjBAGU", "更新微信数字签名异常AccessToken", DateTime.Now);
-                        WeChatHelper4Net.SendMessage.TextToUser("o--NRt9AV2wXeTVl-BLdUzdxtGhQ", "更新微信数字签名异常AccessToken", DateTime.Now);
-                        WeChatHelper4Net.SendMessage.TextToUser("o--NRt5I6jmzBBhIkrOWSqsqXVb4", "更新微信数字签名异常AccessToken", DateTime.Now);
-                    }
-                    */
-                }
-            }
-            catch(Exception Ex)
-            {
-                LogHelper.Save(Ex, "WeChatHelper4Net > AccessToken > UpdateAccessTokenByMemCache()  更新微信数字签名异常！", "AccessToken", LogTime.minute);
-            }
-            return flag;
-        }
+        
         private static AccessTokenCacheModel GetAccessTokenFromDB()
         {
             try
@@ -124,19 +98,12 @@ namespace WeChatHelper4Net
                 return tokenModel.access_token;
             //LogHelper.Save("获取access_token票据，IISCache结束，没有有效的票据。wxAccessToken_IsBusy=" + GlobalFlag.Instance.wxAccessToken_IsBusy, nameof(AccessToken), LogType.Report, LogTime.hour);
 
-            //tokenModel = (AccessTokenXMLModel)PageUtility.GetMemCache(key);
-            //if (CheckAccessToken(tokenModel, now))
-            //{
-            //	return tokenModel.access_token;
-            //}
-
             //LogHelper.Save("获取access_token票据，GetAccessTokenFromDB开始", nameof(AccessToken), LogType.Report, LogTime.hour);
             tokenModel = GetAccessTokenFromDB();
             //LogHelper.Save("获取access_token票据，GetAccessTokenFromDB=" + JsonHelper.Serialize(tokenModel), nameof(AccessToken), LogType.Report, LogTime.hour);
             if(CheckAccessToken(tokenModel, now))
             {
                 CacheHelper.SetCache(key, tokenModel, tokenModel.expires_in / 60);
-                //UpdateAccessTokenByMemCache(tokenModel, key);
                 return tokenModel.access_token;
             }
             //LogHelper.Save("获取access_token票据，GetAccessTokenFromDB结束，没有有效的票据。wxAccessToken_IsBusy=" + GlobalFlag.Instance.wxAccessToken_IsBusy, nameof(AccessToken), LogType.Report, LogTime.hour);
@@ -168,7 +135,6 @@ namespace WeChatHelper4Net
                     try
                     {
                         CacheHelper.SetCache(key, tokenModel, tokenModel.expires_in / 60);
-                        //UpdateAccessTokenByMemCache(tokenModel, key);
                         UpdateAccessTokenToDB(tokenModel);
                     }
                     catch(Exception Ex)
