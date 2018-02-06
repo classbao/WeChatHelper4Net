@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WeChatHelper4Net</RootNamespace>
     <AssemblyName>WeChatHelper4Net</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,7 +71,7 @@
     <Compile Include="Models\JSSDKConfig.cs" />
     <Compile Include="Models\Menu\Base\Base.cs" />
     <Compile Include="Models\Menu\Base\Element.cs" />
-    <Compile Include="Models\Menu\MenuModel.cs" />
+    <Compile Include="Models\Menu\Base\IBase.cs" />
     <Compile Include="Models\MicroMessengerUserAgent.cs" />
     <Compile Include="Models\NewsModel.cs" />
     <Compile Include="Models\PassiveReplyModel.cs" />
@@ -112,13 +113,9 @@
     <Compile Include="XmlHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\chinahxmedia\src\chinahxmedia.BLL\chinahxmedia.BLL.csproj">
-      <Project>{04a8f083-57c3-44e8-b64c-404e07072523}</Project>
-      <Name>chinahxmedia.BLL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\chinahxmedia\src\chinahxmedia.Model\chinahxmedia.Model.csproj">
-      <Project>{e989f86d-7ef6-4114-951f-09cea069d99f}</Project>
-      <Name>chinahxmedia.Model</Name>
+    <ProjectReference Include="..\..\..\XAWS\NewCidTech.Solution\CidTech.Solution\Bussiness\com.cidtechBiz.Activity\com.cidtechBiz.Activity.csproj">
+      <Project>{9b27fd88-dd72-44af-a129-9c4fa00c49c7}</Project>
+      <Name>com.cidtechBiz.Activity</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
