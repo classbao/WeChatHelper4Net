@@ -70,8 +70,8 @@
     <Compile Include="Models\GroupModel.cs" />
     <Compile Include="Models\JSSDKConfig.cs" />
     <Compile Include="Models\Menu\Base\Base.cs" />
-    <Compile Include="Models\Menu\Base\Element.cs" />
     <Compile Include="Models\Menu\Base\IBase.cs" />
+    <Compile Include="Models\Menu\Button.cs" />
     <Compile Include="Models\MicroMessengerUserAgent.cs" />
     <Compile Include="Models\NewsModel.cs" />
     <Compile Include="Models\PassiveReplyModel.cs" />

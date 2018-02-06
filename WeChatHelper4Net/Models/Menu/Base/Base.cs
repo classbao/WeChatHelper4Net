@@ -17,7 +17,7 @@ namespace WeChatHelper4Net.Models.Menu.Base
     /// </summary>
     [Serializable]
     [DataContract]
-    public abstract class Base : IBase
+    public abstract class BaseButton : IBaseButton
     {
         /// <summary>
         /// 菜单标题，不超过16个字节，子菜单不超过60个字节
@@ -25,8 +25,8 @@ namespace WeChatHelper4Net.Models.Menu.Base
         [DataMember(IsRequired = true)]
         public string name { get; set; }
 
-        private Base() { }
-        public Base(string name) { this.name = name; }
+        private BaseButton() { }
+        public BaseButton(string name) { this.name = name; }
         public string ToJson()
         {
             switch(this.GetType().Name)
@@ -52,7 +52,7 @@ namespace WeChatHelper4Net.Models.Menu.Base
     /// </summary>
     [Serializable]
     [DataContract]
-    public abstract class SingleButton : Base, ISingleButton
+    public abstract class SingleButton : BaseButton, ISingleButton
     {
         /// <summary>
         /// 构造函数内部将会初始化赋值
@@ -70,7 +70,7 @@ namespace WeChatHelper4Net.Models.Menu.Base
     /// </summary>
     [Serializable]
     [DataContract]
-    public abstract class absSubButton : Base, ISubButton
+    public abstract class absSubButton : BaseButton, ISubButton
     {
         /// <summary>
         /// 二级菜单组合
@@ -140,10 +140,10 @@ namespace WeChatHelper4Net.Models.Menu.Base
         /// <summary>
         /// 一级菜单组合
         /// </summary>
-        public IList<Base> button { get; set; }
+        public IList<BaseButton> button { get; set; }
 
         public absButton() { }
-        public absButton(IList<Base> button) { this.button = button; }
+        public absButton(IList<BaseButton> button) { this.button = button; }
 
         public string ToJson()
         {

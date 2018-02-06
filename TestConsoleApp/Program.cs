@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WeChatHelper4Net;
+using WeChatHelper4Net.Models.Menu;
 using WeChatHelper4Net.Models.Menu.Base;
 
 namespace TestConsoleApp
@@ -24,7 +25,7 @@ namespace TestConsoleApp
             //string subbuttonJson = subbutton.ToJson();
             //Console.WriteLine(subbuttonJson);
 
-            var button = new Button(new List<Base>()
+            var button = new Button(new List<BaseButton>()
             {
                 new Click("今日歌曲", "V1001_TODAY_MUSIC"),
                 new SubButton("菜单", new List<SingleButton>()

@@ -8,7 +8,7 @@ using System.Collections.Generic;
  */
 namespace WeChatHelper4Net.Models.Menu.Base
 {
-    public interface IBase
+    public interface IBaseButton
     {
         /// <summary>
         /// 菜单标题，不超过16个字节，子菜单不超过60个字节
@@ -21,7 +21,7 @@ namespace WeChatHelper4Net.Models.Menu.Base
         /// <returns></returns>
         string ToJson();
     }
-    public interface ISingleButton : IBase
+    public interface ISingleButton : IBaseButton
     {
         /// <summary>
         /// 菜单类型，构造函数内部将会初始化赋值
@@ -29,7 +29,7 @@ namespace WeChatHelper4Net.Models.Menu.Base
         string type { get; set; }
     }
 
-    public interface ISubButton : IBase
+    public interface ISubButton : IBaseButton
     {
         /// <summary>
         /// 子菜单组合

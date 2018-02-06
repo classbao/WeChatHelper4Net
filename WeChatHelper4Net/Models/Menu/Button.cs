@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using WeChatHelper4Net.Models.Menu.Base;
 
 /*
  * 微信公众账号API，模型
  * 作者：熊学浩
  * 时间：2016-12-12
  */
-namespace WeChatHelper4Net.Models.Menu.Base
+namespace WeChatHelper4Net.Models.Menu
 {
     [Serializable]
     [DataContract]
@@ -175,7 +176,7 @@ namespace WeChatHelper4Net.Models.Menu.Base
     public class Button : absButton
     {
         public Button() : base() { }
-        public Button(IList<Base> button) : base(button) { }
+        public Button(IList<BaseButton> button) : base(button) { }
     }
 
 }
