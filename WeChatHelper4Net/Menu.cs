@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using WeChatHelper4Net.Models;
+using WeChatHelper4Net.Models.Menu;
 
 /*
  * 微信公众账号API
@@ -69,6 +70,15 @@ namespace WeChatHelper4Net
                 LogHelper.Save(Ex);
                 throw Ex;
             }
+        }
+        /// <summary>
+        /// 创建自定义菜单
+        /// </summary>
+        /// <param name="button">自定义菜单对象</param>
+        /// <returns></returns>
+        public static bool CreateMenu(Button button, DateTime now)
+        {
+            return CreateMenu(button.ToJson(), now);
         }
 
         /// <summary>
