@@ -10,4 +10,4 @@
 2，Download本版本库到您本地，将本项目添加到您的解决方案中，或者直接将bin文件夹（bin\Release\）下的`WeChatHelper4Net.dll`添加引用到您的项目中。并且在使用代码前写入以下这段代码即可：
 ```using WeChatHelper4Net;```
 
-2，本版本库详细说明： [全部WiKi文档>>](../../wiki/ "点击阅读")
+3，本版本库详细说明： [全部WiKi文档>>](../../wiki/ "点击阅读")
