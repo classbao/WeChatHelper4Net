@@ -8,7 +8,9 @@
 1，使用前请确认您已经获得[微信公众平台账号](https://mp.weixin.qq.com/ "点击进入")（通过认证的服务号/订阅号/企业号/小程序），或者[微信开放平台](https://open.weixin.qq.com/ "点击进入")账号，并记住AppID，AppSecret引入本库时需要用到。
 
 2，Download本版本库到您本地，将本项目添加到您的解决方案中，或者直接将bin文件夹（bin\Release\）下的`WeChatHelper4Net.dll`添加引用到您的项目中。并且在使用代码前写入以下这段代码即可：
-```using WeChatHelper4Net;```
+```C#
+using WeChatHelper4Net;
+```
 
 3，本版本库详细说明： [全部WiKi文档>>](../../wiki/ "点击阅读")
 
