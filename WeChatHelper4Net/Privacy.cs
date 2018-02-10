@@ -55,11 +55,11 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 开发者ID：AppID(应用ID，微信公众号身份的唯一标识)
         /// </summary>
-        public static readonly string AppId = ConfigHelper.GetAppSetting("WeiXinAppId");
+        public static readonly string AppId = ConfigHelper.GetAppSetting("WeixinAppId");
         /// <summary>
         /// 开发者ID：AppSecret(应用密钥)
         /// </summary>
-        public static readonly string AppSecret = ConfigHelper.GetAppSetting("WeiXinAppSecret");
+        public static readonly string AppSecret = ConfigHelper.GetAppSetting("WeixinAppSecret");
 
         #endregion
 

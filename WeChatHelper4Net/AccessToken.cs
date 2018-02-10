@@ -37,14 +37,15 @@ namespace WeChatHelper4Net
         {
             try
             {
-                var wxtoken = chinahxmedia.BLL.BLLRepository.wxtokenBLL.LoadByName(nameof(AccessToken), Privacy.AppId);
-                if(null != wxtoken && !string.IsNullOrWhiteSpace(wxtoken.token))
+                var wxtoken = com.cidtechBiz.Activity.WeChatService.Instance.GetAccessToken(1);
+                if(null != wxtoken && !string.IsNullOrWhiteSpace(wxtoken.Token))
                 {
                     AccessTokenCacheModel tokenModel = new AccessTokenCacheModel();
-                    tokenModel.appid = wxtoken.appid;
-                    tokenModel.access_token = wxtoken.token;
-                    tokenModel.expires_in = wxtoken.expires_in;
-                    tokenModel.expires_time = (null != wxtoken.expires_time && wxtoken.expires_time.Year > 1970) ? wxtoken.expires_time.ToString("yyyy-MM-dd HH:mm:ss") : string.Empty;
+                    tokenModel.appid = Privacy.AppId;
+                    tokenModel.access_token = wxtoken.Token;
+                    tokenModel.expires_in = 7200;
+                    var expires_time = Common.ConvertTime(Convert.ToInt32(wxtoken.Timestamp)).AddSeconds(tokenModel.expires_in);
+                    tokenModel.expires_time = (null != expires_time && expires_time.Year > 1970) ? expires_time.ToString("yyyy-MM-dd HH:mm:ss") : string.Empty;
                     return tokenModel;
                 }
             }
@@ -61,18 +62,24 @@ namespace WeChatHelper4Net
             if(null == token || string.IsNullOrWhiteSpace(token.access_token)) return false;
             try
             {
-                chinahxmedia.Model.wxtoken wxtoken = new chinahxmedia.Model.wxtoken()
+                com.cidtechBiz.Activity.Access_token wxtoken = new com.cidtechBiz.Activity.Access_token()
                 {
-                    name = nameof(AccessToken),
-                    appid = token.appid,
+                    //name = nameof(AccessToken),
+                    //appid = token.appid,
 
-                    token = token.access_token,
-                    expires_in = token.expires_in,
-                    expires_time = DateTime.SpecifyKind(DateTime.Parse(token.expires_time), DateTime.Now.Kind),
-                    creationtime = DateTime.Now
+                    //Token = token.access_token,
+                    //expires_in = token.expires_in,
+                    //expires_time = DateTime.SpecifyKind(DateTime.Parse(token.expires_time), DateTime.Now.Kind),
+                    //creationtime = DateTime.Now
+                    
+                    Id = 1,
+                    Token = token.access_token,
+                    Timestamp = Common.ConvertTime(DateTime.Now).ToString(),
+                    ModifyDate = DateTime.Now,
+                    TokenType = 1
                 };
 
-                return chinahxmedia.BLL.BLLRepository.wxtokenBLL.UpdateByName(nameof(AccessToken), Privacy.AppId, wxtoken, TimeSpan.FromSeconds(token.expires_in));
+                return com.cidtechBiz.Activity.WeChatService.Instance.ModifyToken(wxtoken);
             }
             catch(Exception Ex)
             {

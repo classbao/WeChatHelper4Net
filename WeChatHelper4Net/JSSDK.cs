@@ -39,14 +39,15 @@ namespace WeChatHelper4Net
         {
             try
             {
-                var ticket = chinahxmedia.BLL.BLLRepository.wxtokenBLL.LoadByName("JSApiTicket", Privacy.AppId);
-                if (null != ticket && !string.IsNullOrWhiteSpace(ticket.token))
+                var ticket = com.cidtechBiz.Activity.WeChatService.Instance.GetAccessToken(2);
+                if (null != ticket && !string.IsNullOrWhiteSpace(ticket.Token))
                 {
                     JSApiTicketCacheModel ticketModel = new JSApiTicketCacheModel();
-                    ticketModel.appid = ticket.appid;
-                    ticketModel.ticket = ticket.token;
-                    ticketModel.expires_in = ticket.expires_in;
-                    ticketModel.expires_time = (null != ticket.expires_time && ticket.expires_time.Year > 1970) ? ticket.expires_time.ToString("yyyy-MM-dd HH:mm:ss") : string.Empty;
+                    ticketModel.appid = Privacy.AppId;
+                    ticketModel.ticket = ticket.Token;
+                    ticketModel.expires_in = 7200;
+                    var expires_time = Common.ConvertTime(Convert.ToInt32(ticket.Timestamp));
+                    ticketModel.expires_time = (null != expires_time && expires_time.Year > 1970) ? expires_time.ToString("yyyy-MM-dd HH:mm:ss") : string.Empty;
                     return ticketModel;
                 }
             }
@@ -63,18 +64,24 @@ namespace WeChatHelper4Net
             if (null == ticket || string.IsNullOrWhiteSpace(ticket.ticket)) return false;
             try
             {
-                chinahxmedia.Model.wxtoken wxtoken = new chinahxmedia.Model.wxtoken()
+                com.cidtechBiz.Activity.Access_token wxtoken = new com.cidtechBiz.Activity.Access_token()
                 {
-                    name = "JSApiTicket",
-                    appid = ticket.appid,
+                    //name = "JSApiTicket",
+                    //appid = ticket.appid,
 
-                    token = ticket.ticket,
-                    expires_in = ticket.expires_in,
-                    expires_time = DateTime.SpecifyKind(DateTime.Parse(ticket.expires_time), DateTime.Now.Kind),
-                    creationtime = DateTime.Now
+                    //token = ticket.ticket,
+                    //expires_in = ticket.expires_in,
+                    //expires_time = DateTime.SpecifyKind(DateTime.Parse(ticket.expires_time), DateTime.Now.Kind),
+                    //creationtime = DateTime.Now
+
+                    Id = 2,
+                    Token = ticket.ticket,
+                    Timestamp = Common.ConvertTime(DateTime.Now).ToString(),
+                    ModifyDate = DateTime.Now,
+                    TokenType = 2
                 };
 
-                return chinahxmedia.BLL.BLLRepository.wxtokenBLL.UpdateByName("JSApiTicket", Privacy.AppId, wxtoken, TimeSpan.FromSeconds(ticket.expires_in));
+                return com.cidtechBiz.Activity.WeChatService.Instance.ModifyToken(wxtoken);
             }
             catch (Exception Ex)
             {
