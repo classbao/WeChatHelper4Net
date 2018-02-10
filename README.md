@@ -11,3 +11,10 @@
 ```using WeChatHelper4Net;```
 
 3，本版本库详细说明： [全部WiKi文档>>](../../wiki/ "点击阅读")
+
+交流互助：
+-----
+本版本库面向互联网免费开放使用，并且秉持开源理念，欢迎建议和意见，也欢迎提交您的改进代码。
+>联系方式
+>* 欢迎关注作者微博 [熊仔其人](https://weibo.com/xiongzaiqiren "点击进入熊仔其人的微博")，微信公众号`xiongzaiqirenGG`，博客园[熊仔其人](https://www.cnblogs.com/xiongzaiqiren "熊仔其人的博客园")，或者加入QQ群：`125012893`
+>* 如有紧急情况请联系`xiongzaiqiren@163.com`
