@@ -69,27 +69,27 @@ namespace SampleWebApp.Models
         {
             JSSDK.GetJSApiTicketFromStorage get = delegate (DateTime Now, string AppId)
             {
-                //根据AppId从自定义存储库(接入者的DB、Cache、仓储源)获取AccessToken
+                //根据AppId从自定义存储库(接入者的DB、Cache、仓储源)获取JSApiTicket
                 /*
-                 * return GetAccessTokenByCache(AppId);
-                 * return GetAccessTokenByRedis(AppId);
-                 * return GetAccessTokenByMemcache(AppId);
-                 * return GetAccessTokenByMongodb(AppId);
-                 * return GetAccessTokenByDB(AppId);
+                 * return GetJSApiTicketByCache(AppId);
+                 * return GetJSApiTicketByRedis(AppId);
+                 * return GetJSApiTicketByMemcache(AppId);
+                 * return GetJSApiTicketByMongodb(AppId);
+                 * return GetJSApiTicketByDB(AppId);
                  * ……
                  */
 
                 return null;
             };
-            JSSDK.UpdateJSApiTicketToStorage update = delegate (DateTime now, JSApiTicketCacheModel Token)
+            JSSDK.UpdateJSApiTicketToStorage update = delegate (DateTime now, JSApiTicketCacheModel Ticket)
             {
-                //根据Token.appid将AccessToken插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
+                //根据Ticket.appid将JSApiTicket插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
                 /*
-                 * return UpdateAccessTokenByCache(Token.appid, Token);
-                 * return UpdateAccessTokenByRedis(Token.appid, Token);
-                 * return UpdateAccessTokenByMemcache(Token.appid, Token);
-                 * return UpdateAccessTokenByMongodb(Token.appid, Token);
-                 * return UpdateAccessTokenByDB(Token.appid, Token);
+                 * return UpdateJSApiTicketByCache(Ticket.appid, Ticket);
+                 * return UpdateJSApiTicketByRedis(Ticket.appid, Ticket);
+                 * return UpdateJSApiTicketByMemcache(Ticket.appid, Ticket);
+                 * return UpdateJSApiTicketByMongodb(Ticket.appid, Ticket);
+                 * return UpdateJSApiTicketByDB(Ticket.appid, Ticket);
                  * ……
                  */
 
