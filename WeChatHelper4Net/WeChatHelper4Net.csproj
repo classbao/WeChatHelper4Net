@@ -47,6 +47,9 @@
     <Compile Include="AccessToken.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="Crypto\Cryptography.cs" />
+    <Compile Include="Crypto\Sample.cs" />
+    <Compile Include="Crypto\WXBizMsgCrypt.cs" />
     <Compile Include="CustomService\SendMsg.cs" />
     <Compile Include="Extend\ConfigHelper.cs" />
     <Compile Include="Extend\DictionaryExtend.cs" />
@@ -117,6 +120,9 @@
       <Project>{9b27fd88-dd72-44af-a129-9c4fa00c49c7}</Project>
       <Name>com.cidtechBiz.Activity</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Crypto\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
