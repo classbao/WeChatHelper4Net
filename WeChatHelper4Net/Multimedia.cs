@@ -107,9 +107,9 @@ namespace WeChatHelper4Net
         /// <param name="physicalFolder">保存目标物理文件夹路径。例如：D:\\UploadFiles\\</param>
         /// <param name="fileName">保存文件名</param>
         /// <param name="fileSize">文件大小</param>
-        /// <param name="now">当前时间对象</param>
+        /// <param name="access_token">access_token</param>
         /// <returns>多媒体保存路径（多个ID用英文半角逗号分隔）</returns>
-        public static string DownloadMultimedia(string MEDIA_ID, string physicalFolder, string fileName, out long fileSize, DateTime now)
+        public static string DownloadMultimedia(string MEDIA_ID, string physicalFolder, string fileName, out long fileSize, string access_token)
         {
             fileSize = 0;
             if(string.IsNullOrWhiteSpace(MEDIA_ID)) throw new Exception("必传参数MEDIA_ID不能为空！");
@@ -134,12 +134,12 @@ namespace WeChatHelper4Net
                         _fileName = fileName + num;
                     }
 
-                    result.AppendFormat("{0},", DownloadMultimedia(AccessToken.GetAccessToken(now), mediaId, physicalFolder, _fileName, out fileSize));
+                    result.AppendFormat("{0},", DownloadMultimedia(access_token, mediaId, physicalFolder, _fileName, out fileSize));
                 }
                 return Regex.Replace(result.ToString(), @"(^[,，\s]+)|([,，\s]+$)", "").ToString();
             }
             else
-                return DownloadMultimedia(AccessToken.GetAccessToken(now), MEDIA_ID, physicalFolder, fileName, out fileSize);
+                return DownloadMultimedia(access_token, MEDIA_ID, physicalFolder, fileName, out fileSize);
         }
         #endregion
     }

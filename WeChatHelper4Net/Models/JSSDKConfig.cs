@@ -16,7 +16,7 @@ namespace WeChatHelper4Net.Models.JSSDK
     public class JSSDKConfig
     {
         [DataMember(IsRequired = false)]
-        public string appId { get { return Privacy.AppId; } }
+        public string appId { get; set; }
 
         [DataMember(IsRequired = false)]
         public int timestamp { get; set; }

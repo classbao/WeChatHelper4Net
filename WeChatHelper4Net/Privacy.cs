@@ -34,32 +34,17 @@ namespace WeChatHelper4Net
 
         #region 微信公众号
         /// <summary>
-        /// 微信公众号域名（结尾不包含“/”）
-        /// </summary>
-        public static readonly string wxDomainName = ConfigHelper.GetAppSetting("WeiXinDomainName");
-        /// <summary>
-        /// 公众微信号名称
-        /// </summary>
-        public static readonly string wxName = ConfigHelper.GetAppSetting("WeiXinName");
-        /// <summary>
-        /// 公众微信号
-        /// </summary>
-        public static readonly string wxNumber = ConfigHelper.GetAppSetting("WeiXinNumber");
-        /// <summary>
         /// 公众微信号（原始ID）
         /// </summary>
-        public static readonly string wxId = ConfigHelper.GetAppSetting("WeiXinId");
-
-
-
+        public static readonly string WeChatId = ConfigHelper.GetAppSetting("WeChatId");
         /// <summary>
         /// 开发者ID：AppID(应用ID，微信公众号身份的唯一标识)
         /// </summary>
-        public static readonly string AppId = ConfigHelper.GetAppSetting("WeixinAppId");
+        public static readonly string AppId = ConfigHelper.GetAppSetting("WeChatAppId");
         /// <summary>
         /// 开发者ID：AppSecret(应用密钥)
         /// </summary>
-        public static readonly string AppSecret = ConfigHelper.GetAppSetting("WeixinAppSecret");
+        public static readonly string AppSecret = ConfigHelper.GetAppSetting("WeChatAppSecret");
 
         #endregion
 

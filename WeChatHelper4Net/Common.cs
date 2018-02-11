@@ -31,21 +31,9 @@ namespace WeChatHelper4Net
 
         #region 公众微信号相关信息
         /// <summary>
-        /// 微信公众号域名（结尾不包含“/”）
-        /// </summary>
-        public static string WeiXinDomainName { get { return Privacy.wxDomainName; } }
-        /// <summary>
-        /// 公众微信号名称
-        /// </summary>
-        public static string WeiXinName { get { return Privacy.wxName; } }
-        /// <summary>
-        /// 公众微信号
-        /// </summary>
-        public static string WeiXinNumber { get { return Privacy.wxNumber; } }
-        /// <summary>
         /// 公众微信号（原始ID）
         /// </summary>
-        public static string WeiXinId { get { return Privacy.wxId; } }
+        public static string WeChatId { get { return Privacy.WeChatId; } }
         /// <summary>
         /// 开发者ID：AppID(应用ID，微信公众号身份的唯一标识)
         /// </summary>

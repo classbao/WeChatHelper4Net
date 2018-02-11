@@ -21,11 +21,11 @@ namespace WeChatHelper4Net
 		/// 查询所有分组
 		/// </summary>
 		/// <returns>GroupsModel</returns>
-		public static GroupsModel GetGroup(DateTime now)
+		public static GroupsModel GetGroup(string access_token)
 		{
 			try
 			{
-				string url = Common.ApiUrl + string.Format("groups/get?access_token={0}", AccessToken.GetAccessToken(now));
+				string url = Common.ApiUrl + string.Format("groups/get?access_token={0}", access_token);
 				string result = HttpRequestHelper.Request(url, HttpRequestHelper.Method.GET);
 				if (!string.IsNullOrEmpty(result))
 				{
@@ -45,12 +45,12 @@ namespace WeChatHelper4Net
 		/// </summary>
 		/// <param name="openid">用户的OpenID</param>
 		/// <returns>GroupModel</returns>
-		public static GroupModel GetGroupID(string openid, DateTime now)
+		public static GroupModel GetGroupID(string openid, string access_token)
 		{
 			if (string.IsNullOrEmpty(openid)) return new GroupModel();
 			try
 			{
-				string url = Common.ApiUrl + string.Format("groups/getid?access_token={0}", AccessToken.GetAccessToken(now));
+				string url = Common.ApiUrl + string.Format("groups/getid?access_token={0}", access_token);
 				string data = "{\"openid\":\"OpenId\"}";
 				data = data.Replace("OpenId", openid);
 				string result = HttpRequestHelper.Request(url, data, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
@@ -73,12 +73,12 @@ namespace WeChatHelper4Net
 		/// <param name="groupId">分组id，由微信分配</param>
 		/// <param name="name">分组名字（30个字符以内）</param>
 		/// <returns>RequestResultBaseModel</returns>
-		public static RequestResultBaseModel UpdateGroupName(int groupId, string name, DateTime now)
+		public static RequestResultBaseModel UpdateGroupName(int groupId, string name, string access_token)
 		{
 			if (groupId == null || groupId < 1 || string.IsNullOrEmpty(name)) return new RequestResultBaseModel();
 			try
 			{
-				string url = Common.ApiUrl + string.Format("groups/update?access_token={0}", AccessToken.GetAccessToken(now));
+				string url = Common.ApiUrl + string.Format("groups/update?access_token={0}", access_token);
 				string data = "{\"group\":{\"id\":GroupID,\"name\":\"GroupName\"}}";
 				data = data.Replace("GroupID", groupId.ToString())
 					.Replace("GroupName", name);
@@ -102,12 +102,12 @@ namespace WeChatHelper4Net
 		/// <param name="openid">用户的OpenID</param>
 		/// <param name="groupId">分组id，由微信分配</param>
 		/// <returns>RequestResultBaseModel</returns>
-		public static RequestResultBaseModel MoveUserToGroup(string openid, int groupId, DateTime now)
+		public static RequestResultBaseModel MoveUserToGroup(string openid, int groupId, string access_token)
 		{
 			if (groupId == null || groupId < 1 || string.IsNullOrEmpty(openid)) return new RequestResultBaseModel();
 			try
 			{
-				string url = Common.ApiUrl + string.Format("groups/members/update?access_token={0}", AccessToken.GetAccessToken(now));
+				string url = Common.ApiUrl + string.Format("groups/members/update?access_token={0}", access_token);
 				string data = "{\"openid\":\"OpenId\",\"to_groupid\":GroupID}";
 				data = data.Replace("GroupID", groupId.ToString())
 					.Replace("OpenId", openid);
@@ -130,12 +130,12 @@ namespace WeChatHelper4Net
 		/// </summary>
 		/// <param name="name">分组名字（30个字符以内）</param>
 		/// <returns>JSON数据包</returns>
-		public static GroupSubModel CreateGroup(string name, DateTime now)
+		public static GroupSubModel CreateGroup(string name, string access_token)
 		{
 			if (string.IsNullOrEmpty(name)) return new GroupSubModel();
 			try
 			{
-				string url = Common.ApiUrl + string.Format("groups/create?access_token={0}", AccessToken.GetAccessToken(now));
+				string url = Common.ApiUrl + string.Format("groups/create?access_token={0}", access_token);
 				string data = "{\"group\":{\"name\":\"GroupName\"}}";
 				data = data.Replace("GroupName", name);
 				string result = HttpRequestHelper.Request(url, data, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
@@ -159,13 +159,13 @@ namespace WeChatHelper4Net
 		/// </summary>
 		/// <param name="openid">普通用户的标识，对当前公众号唯一</param>
 		/// <returns>UserModel</returns>
-		public static UserModel GetUserInfo(string openid, DateTime now)
+		public static UserModel GetUserInfo(string openid, string access_token)
 		{
 			if (string.IsNullOrEmpty(openid)) return new UserModel();
 			string result = string.Empty;
 			try
 			{
-				string url = Common.ApiUrl + string.Format("user/info?access_token={0}&openid={1}&lang=zh_CN", AccessToken.GetAccessToken(now), openid);
+				string url = Common.ApiUrl + string.Format("user/info?access_token={0}&openid={1}&lang=zh_CN", access_token, openid);
 				result = HttpRequestHelper.Request(url, HttpRequestHelper.Method.GET);
 				if (!string.IsNullOrEmpty(result))
 				{
@@ -187,11 +187,11 @@ namespace WeChatHelper4Net
 		/// </summary>
 		/// <param name="next_openid">第一个拉取的OPENID，不填默认从头开始拉取</param>
 		/// <returns>UserListModel</returns>
-		public static UserListModel GetUsers(string next_openid, DateTime now)
+		public static UserListModel GetUsers(string next_openid, string access_token)
 		{
 			try
 			{
-				string url = Common.ApiUrl + string.Format("user/get?access_token={0}&next_openid={1}", AccessToken.GetAccessToken(now), string.IsNullOrEmpty(next_openid) ? string.Empty : next_openid);
+				string url = Common.ApiUrl + string.Format("user/get?access_token={0}&next_openid={1}", access_token, string.IsNullOrEmpty(next_openid) ? string.Empty : next_openid);
 				string result = HttpRequestHelper.Request(url, HttpRequestHelper.Method.GET);
 				if (!string.IsNullOrEmpty(result))
 				{

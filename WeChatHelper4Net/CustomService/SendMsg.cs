@@ -16,15 +16,15 @@ namespace WeChatHelper4Net.CustomService
     {
         private SendMsg() { }
 
-        private static string SendMsgApiUrl(DateTime now)
+        private static string SendMsgApiUrl(string access_token)
         {
-            return Common.ApiUrl + string.Format("message/custom/send?access_token={0}", AccessToken.GetAccessToken(now));
+            return Common.ApiUrl + string.Format("message/custom/send?access_token={0}", access_token);
         }
 
         
 
         #region 发送文本消息
-        public static RequestResultBaseModel SendText(TextMsg msg, DateTime now)
+        public static RequestResultBaseModel SendText(TextMsg msg, string access_token)
         {
             if (null == msg)
                 throw new ArgumentException("参数错误", nameof(msg));
@@ -34,7 +34,7 @@ namespace WeChatHelper4Net.CustomService
                 throw new ArgumentException("content参数错误");
 
             string jsonString = JsonHelper.Serialize(msg);
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(now), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
+            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
             if (Common.ReturnJSONisOK(result))
                 return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
             else
@@ -42,13 +42,13 @@ namespace WeChatHelper4Net.CustomService
                 RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
                 if (entity != null)
                 {
-                    entity.url = SendMsgApiUrl(now);
+                    entity.url = SendMsgApiUrl(access_token);
                     entity.date = jsonString;
                 }
                 return entity;
             }
         }
-        public static RequestResultBaseModel SendText(string openId, string content, DateTime now)
+        public static RequestResultBaseModel SendText(string openId, string content, string access_token)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 throw new ArgumentException("参数错误", nameof(openId));
@@ -58,7 +58,7 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = "{\"touser\":\"OPENID\",\"msgtype\":\"text\",\"text\":{\"content\":\"Hello World\"}}";
             jsonString = jsonString.Replace("OPENID", openId).Replace("Hello World", content);
 
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(now), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
+            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
             if (Common.ReturnJSONisOK(result))
                 return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
             else
@@ -66,13 +66,13 @@ namespace WeChatHelper4Net.CustomService
                 RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
                 if (entity != null)
                 {
-                    entity.url = SendMsgApiUrl(now);
+                    entity.url = SendMsgApiUrl(access_token);
                     entity.date = jsonString;
                 }
                 return entity;
             }
         }
-        public static RequestResultBaseModel SendTextByKF(kfTextMsg msg, DateTime now)
+        public static RequestResultBaseModel SendTextByKF(kfTextMsg msg, string access_token)
         {
             if (null == msg)
                 throw new ArgumentException("参数错误", nameof(msg));
@@ -84,7 +84,7 @@ namespace WeChatHelper4Net.CustomService
                 throw new ArgumentException("customservice参数不能为空");
 
             string jsonString = JsonHelper.Serialize(msg);
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(now), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
+            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
             if (Common.ReturnJSONisOK(result))
                 return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
             else
@@ -92,13 +92,13 @@ namespace WeChatHelper4Net.CustomService
                 RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
                 if (entity != null)
                 {
-                    entity.url = SendMsgApiUrl(now);
+                    entity.url = SendMsgApiUrl(access_token);
                     entity.date = jsonString;
                 }
                 return entity;
             }
         }
-        public static RequestResultBaseModel SendTextByKF(string openId, string content, string kfAccount, DateTime now)
+        public static RequestResultBaseModel SendTextByKF(string openId, string content, string kfAccount, string access_token)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 throw new ArgumentException("参数错误", nameof(openId));
@@ -109,7 +109,7 @@ namespace WeChatHelper4Net.CustomService
 
             string jsonString = "{\"touser\":\"OPENID\",\"msgtype\":\"text\",\"text\":{\"content\":\"Hello World\"},\"customservice\":{\"kf_account\":\"test1@kftest\"}}";
             jsonString = jsonString.Replace("OPENID", openId).Replace("Hello World", content).Replace("test1@kftest", kfAccount);
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(now), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
+            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
             if (Common.ReturnJSONisOK(result))
                 return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
             else
@@ -117,7 +117,7 @@ namespace WeChatHelper4Net.CustomService
                 RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
                 if (entity != null)
                 {
-                    entity.url = SendMsgApiUrl(now);
+                    entity.url = SendMsgApiUrl(access_token);
                     entity.date = jsonString;
                 }
                 return entity;
@@ -126,7 +126,7 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送图片消息
-        public static string SendImage(ImageMsg msg, DateTime now)
+        public static string SendImage(ImageMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -140,7 +140,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendImage(string openId, string mediaId, DateTime now)
+        public static string SendImage(string openId, string mediaId)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -151,7 +151,7 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID", mediaId);
             return jsonString;
         }
-        public static string SendImageByKF(kfImageMsg msg, DateTime now)
+        public static string SendImageByKF(kfImageMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -167,7 +167,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendImageByKF(string openId, string mediaId, string kfAccount, DateTime now)
+        public static string SendImageByKF(string openId, string mediaId, string kfAccount)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -183,7 +183,7 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送语音消息
-        public static string SendVoice(VoiceMsg msg, DateTime now)
+        public static string SendVoice(VoiceMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -197,7 +197,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendVoice(string openId, string mediaId, DateTime now)
+        public static string SendVoice(string openId, string mediaId)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -208,7 +208,7 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID", mediaId);
             return jsonString;
         }
-        public static string SendVoiceByKF(kfVoiceMsg msg, DateTime now)
+        public static string SendVoiceByKF(kfVoiceMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -224,7 +224,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendVoiceByKF(string openId, string mediaId, string kfAccount, DateTime now)
+        public static string SendVoiceByKF(string openId, string mediaId, string kfAccount)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -240,7 +240,7 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送视频消息
-        public static string SendVideo(VideoMsg msg, DateTime now)
+        public static string SendVideo(VideoMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -257,7 +257,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendVideo(string openId, string mediaId, string thumb_media_id, string title, string description, DateTime now)
+        public static string SendVideo(string openId, string mediaId, string thumb_media_id, string title, string description)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -270,7 +270,7 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID1", mediaId).Replace("MEDIA_ID2", thumb_media_id).Replace("TITLE", title).Replace("DESCRIPTION", description);
             return jsonString;
         }
-        public static string SendVideoByKF(kfVideoMsg msg, DateTime now)
+        public static string SendVideoByKF(kfVideoMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -286,7 +286,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendVideoByKF(string openId, string mediaId, string thumb_media_id, string title, string description, string kfAccount, DateTime now)
+        public static string SendVideoByKF(string openId, string mediaId, string thumb_media_id, string title, string description, string kfAccount)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -304,7 +304,7 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送音乐消息
-        public static string SendMusic(MusicMsg msg, DateTime now)
+        public static string SendMusic(MusicMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -318,7 +318,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendMusic(string openId, string title, string description, string musicurl, string hqmusicurl, string thumb_media_id, DateTime now)
+        public static string SendMusic(string openId, string title, string description, string musicurl, string hqmusicurl, string thumb_media_id)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -331,7 +331,7 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MUSIC_TITLE", title).Replace("MUSIC_DESCRIPTION", description).Replace("HQ_MUSIC_URL", hqmusicurl).Replace("MUSIC_URL", musicurl).Replace("THUMB_MEDIA_ID", thumb_media_id);
             return jsonString;
         }
-        public static string SendMusicByKF(kfMusicMsg msg, DateTime now)
+        public static string SendMusicByKF(kfMusicMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -347,7 +347,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendMusicByKF(string openId, string title, string description, string musicurl, string hqmusicurl, string thumb_media_id, string kfAccount, DateTime now)
+        public static string SendMusicByKF(string openId, string title, string description, string musicurl, string hqmusicurl, string thumb_media_id, string kfAccount)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -365,7 +365,7 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送图文消息
-        public static string SendNews(NewsMsg msg, DateTime now)
+        public static string SendNews(NewsMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -380,7 +380,7 @@ namespace WeChatHelper4Net.CustomService
             return string.Empty;
         }
 
-        public static string SendNewsByKF(kfNewsMsg msg, DateTime now)
+        public static string SendNewsByKF(kfNewsMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -397,7 +397,7 @@ namespace WeChatHelper4Net.CustomService
             return string.Empty;
         }
 
-        public static string SendmpNews(mpNewsMsg msg, DateTime now)
+        public static string SendmpNews(mpNewsMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -412,7 +412,7 @@ namespace WeChatHelper4Net.CustomService
             return string.Empty;
         }
 
-        public static string SendmpNewsByKF(kfmpNewsMsg msg, DateTime now)
+        public static string SendmpNewsByKF(kfmpNewsMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -432,7 +432,7 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送卡券
-        public static string SendwxCard(wxCardMsg msg, DateTime now)
+        public static string SendwxCard(wxCardMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -446,7 +446,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendwxCard(string openId, string card_id, DateTime now)
+        public static string SendwxCard(string openId, string card_id)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;
@@ -457,7 +457,7 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("CARD_ID", card_id);
             return jsonString;
         }
-        public static string SendwxCardByKF(kfwxCardMsg msg, DateTime now)
+        public static string SendwxCardByKF(kfwxCardMsg msg)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
                 return string.Empty;
@@ -473,7 +473,7 @@ namespace WeChatHelper4Net.CustomService
             }
             return string.Empty;
         }
-        public static string SendwxCardByKF(string openId, string card_id, string kfAccount, DateTime now)
+        public static string SendwxCardByKF(string openId, string card_id, string kfAccount)
         {
             if (string.IsNullOrWhiteSpace(openId))
                 return string.Empty;

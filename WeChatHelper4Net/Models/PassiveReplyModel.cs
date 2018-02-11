@@ -16,7 +16,7 @@ namespace WeChatHelper4Net.Models.PassiveReply
     //[XmlRoot("xml")]
     public class PassiveReplyModel
     {
-        public PassiveReplyModel() { FromUserName = Common.WeiXinId; }
+        public PassiveReplyModel() { FromUserName = Common.WeChatId; }
 
         [DataMember(IsRequired = true)]
         [XmlElement(ElementName = nameof(ToUserName))]

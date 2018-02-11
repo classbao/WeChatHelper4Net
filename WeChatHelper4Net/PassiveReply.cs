@@ -27,7 +27,7 @@ namespace WeChatHelper4Net
 
 
 
-        public static string ReplyText(ReplyTextModel entity, DateTime now)
+        public static string ReplyText(ReplyTextModel entity)
         {
             if (null != entity && !string.IsNullOrWhiteSpace(entity.ToUserName))
             {
@@ -40,7 +40,7 @@ namespace WeChatHelper4Net
             return ReplyEmpty();
         }
 
-        public static string ReplyImage(ReplyImageModel entity, DateTime now)
+        public static string ReplyImage(ReplyImageModel entity)
         {
             if (null != entity && !string.IsNullOrWhiteSpace(entity.ToUserName) && null != entity.Image)
             {
@@ -99,7 +99,7 @@ namespace WeChatHelper4Net
             return ReplyEmpty();
         }
 
-        public static string ReplyVoice(ReplyVoiceModel entity, DateTime now)
+        public static string ReplyVoice(ReplyVoiceModel entity)
         {
             if (null != entity && !string.IsNullOrWhiteSpace(entity.ToUserName) && null != entity.Voice)
             {
@@ -158,7 +158,7 @@ namespace WeChatHelper4Net
             return ReplyEmpty();
         }
 
-        public static string ReplyVideo(ReplyVideoModel entity, DateTime now)
+        public static string ReplyVideo(ReplyVideoModel entity)
         {
             if (null != entity && !string.IsNullOrWhiteSpace(entity.ToUserName) && null != entity.Video)
             {
@@ -227,7 +227,7 @@ namespace WeChatHelper4Net
             return ReplyEmpty();
         }
 
-        public static string ReplyMusic(ReplyMusicModel entity, DateTime now)
+        public static string ReplyMusic(ReplyMusicModel entity)
         {
             if (null != entity && !string.IsNullOrWhiteSpace(entity.ToUserName) && null != entity.Music)
             {
@@ -306,7 +306,7 @@ namespace WeChatHelper4Net
             return ReplyEmpty();
         }
 
-        public static string ReplyNews(ReplyNewsModel entity, DateTime now)
+        public static string ReplyNews(ReplyNewsModel entity)
         {
             if (null != entity && !string.IsNullOrWhiteSpace(entity.ToUserName) && null != entity.Articles && entity.Articles.list.Count > 0)
             {

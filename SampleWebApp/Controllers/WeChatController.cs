@@ -45,6 +45,23 @@ namespace SampleWebApp.Controllers
             }
         }
 
+        /// <summary>
+        /// http://weixin.classbao.com/WeChat/GetAccessToken
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetAccessToken()
+        {
+            return Content(Models.TokenOrTicket.GetAccessToken().access_token);
+        }
+        /// <summary>
+        /// http://weixin.classbao.com/WeChat/GetJSConfig
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetJSConfig()
+        {
+            return Content(JsonHelper.Serialize(Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri)));
+        }
+
 
         /// <summary>
         /// 创建自定义菜单：http://weixin.classbao.com/WeChat/CreateMenu
@@ -81,7 +98,8 @@ namespace SampleWebApp.Controllers
             });
             string buttonJson = button.ToJson();
 
-            if(Menu.CreateMenu(button, DateTime.Now))
+            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            if(Menu.CreateMenu(button, access_token))
             {
                 return Content("创建自定义菜单 成功。");
             }
