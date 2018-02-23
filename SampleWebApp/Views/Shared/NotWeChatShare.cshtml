@@ -1,0 +1,65 @@
+﻿@model WeChatHelper4Net.Models.JSSDK.WeiXinShareData
+
+@{
+    //微信JS-SDK授权配置
+    var jsConfig = SampleWebApp.Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
+}
+
+<!--微信窗口设置开始-->
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+	wx.config({
+		//debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+		appId: "@jsConfig.appId",
+		timestamp: parseInt("@jsConfig.timestamp"),
+		nonceStr: "@jsConfig.nonceStr",
+		signature: "@jsConfig.signature",
+		jsApiList: [
+		  // 所有要调用的 API 都要加到这个列表中
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            //'onMenuShareQQ',
+            //'onMenuShareWeibo',
+            //'onMenuShareQZone',
+            'startRecord',
+            'stopRecord',
+            'onVoiceRecordEnd',
+            'playVoice',
+            'pauseVoice',
+            'stopVoice',
+            'onVoicePlayEnd',
+            'uploadVoice',
+            'downloadVoice',
+            'chooseImage',
+            'previewImage',
+            'uploadImage',
+            'downloadImage',
+            'translateVoice',
+            'getNetworkType',
+            'openLocation',
+            'getLocation',
+            'hideOptionMenu',
+            'showOptionMenu',
+            'hideMenuItems',
+            'showMenuItems',
+            'hideAllNonBaseMenuItem',
+            'showAllNonBaseMenuItem',
+            'closeWindow',
+            'scanQRCode',
+            'chooseWXPay',
+            'openProductSpecificView',
+            'addCard',
+            'chooseCard',
+            'openCard'
+		]
+	});
+	//微信分享信息设置
+    var shareData = null;
+
+	//初始化选项
+	$(document).ready(function () {
+
+	});
+</script>
+<script type="text/javascript" src="@Url.Content("~/Content/js/jweixinHelper.js")"></script>
+<!--微信窗口设置结束-->

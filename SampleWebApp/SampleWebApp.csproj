@@ -102,10 +102,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SharedController.cs" />
     <Compile Include="Controllers\WeChatController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CustomWeChatShareData.cs" />
     <Compile Include="Models\TokenOrTicket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -116,6 +119,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Properties\PublishProfiles\SampleWebAppRelease.pubxml" />
+    <Content Include="Views\Shared\WeChatShare.cshtml" />
+    <Content Include="Views\Shared\NotWeChatShare.cshtml" />
+    <Content Include="Views\Home\AllowWeChatToShare.cshtml" />
+    <Content Include="Views\Home\NotAllowWeChatToShare.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

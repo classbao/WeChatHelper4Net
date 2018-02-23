@@ -1,0 +1,20 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>不允许微信分享的页面</title>
+
+    @{ Html.RenderPartial("~/Views/Shared/NotWeChatShare.cshtml", new WeChatHelper4Net.Models.JSSDK.WeiXinShareData() { title = "标题", desc = "内容描述", link = Request.Url.AbsoluteUri, imgUrl = "分享图标" }); }
+
+</head>
+<body>
+    <div> 
+    </div>
+</body>
+</html>

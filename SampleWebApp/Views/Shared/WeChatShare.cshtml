@@ -1,0 +1,155 @@
+﻿@model WeChatHelper4Net.Models.JSSDK.WeiXinShareData
+
+@{
+    //微信JS-SDK授权配置
+    var jsConfig = SampleWebApp.Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
+ }
+
+<!--微信窗口设置开始-->
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+	wx.config({
+		//debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+		appId: "@jsConfig.appId",
+		timestamp: parseInt("@jsConfig.timestamp"),
+		nonceStr: "@jsConfig.nonceStr",
+		signature: "@jsConfig.signature",
+		jsApiList: [
+		  // 所有要调用的 API 都要加到这个列表中
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            //'onMenuShareQQ',
+            //'onMenuShareWeibo',
+            //'onMenuShareQZone',
+            'startRecord',
+            'stopRecord',
+            'onVoiceRecordEnd',
+            'playVoice',
+            'pauseVoice',
+            'stopVoice',
+            'onVoicePlayEnd',
+            'uploadVoice',
+            'downloadVoice',
+            'chooseImage',
+            'previewImage',
+            'uploadImage',
+            'downloadImage',
+            'translateVoice',
+            'getNetworkType',
+            'openLocation',
+            'getLocation',
+            'hideOptionMenu',
+            'showOptionMenu',
+            'hideMenuItems',
+            'showMenuItems',
+            'hideAllNonBaseMenuItem',
+            'showAllNonBaseMenuItem',
+            'closeWindow',
+            'scanQRCode',
+            'chooseWXPay',
+            'openProductSpecificView',
+            'addCard',
+            'chooseCard',
+            'openCard'
+		]
+	});
+	//微信分享信息设置
+	var shareData = {
+		title: "@(Model.title)", // 分享标题
+		desc: "@(Model.desc)", // 分享描述
+		link: "@Model.link".replace(/(&amp;)/ig, "&"), // 分享链接
+		imgUrl: "@Model.imgUrl", // 分享图标
+		type: "@Model.type", // 分享类型,music、video或link，不填默认为link
+		dataUrl: "@Model.dataUrl", // 如果type是music或video，则要提供数据链接，默认为空
+		trigger: function (res) {
+			// 监听Menu中的按钮点击时触发的方法，该方法仅支持Menu中的相关接口。
+			//alert("trigger \n\r" + JSON.stringify(res) + "\n\r" + res.errMsg);
+		},
+		success: function (res) {
+			// 接口调用成功时执行的回调函数。
+			//alert("success---" + JSON.stringify(res) + "\n\r" + res.errMsg);
+		    if (JWeixinHelper.isShareSuccess(res).success) {
+
+				//分享成功
+				//$.messager.alert("分享成功。" + res.errMsg, "", null, 30000);
+		        @*share("@Model.CurrentUser.OpenID", "@Model.metaid", "@((int)Model.metatype)", shareData.title, shareData.link);*@
+
+		        //特殊对待
+		    	if ("@Model.link.Contains("TeacherActivityResult2015")".toLowerCase() == "true") {
+		    		$("#returnButton").text("已寄出，去首页");
+		    	};
+
+		    }
+		},
+		fail: function (res) {
+			// 接口调用失败时执行的回调函数。
+			//alert("fail---" + JSON.stringify(res) + "\n\r" + res.errMsg);
+			//alert("分享失败！\n\r" + res.errMsg);
+			$.messager.alert("分享失败！<br />" + res.errMsg, "", null, 0);
+		},
+		cancel: function (res) {
+			// 用户点击取消时的回调函数，仅部分有用户取消操作的api才会用到。
+			//alert("cancel---" + JSON.stringify(res) + "\n\r" + res.errMsg);
+		},
+		complete: function (res) {
+			// 接口调用完成时执行的回调函数，无论成功或失败都会执行。
+			//alert("complete---" + JSON.stringify(res) + "\n\r" + res.errMsg);
+		},
+	};
+
+	//初始化选项
+	$(document).ready(function () {
+
+	});
+</script>
+<script type="text/javascript" src="@Url.Content("~/Content/js/jweixinHelper.js")"></script>
+<!--微信窗口设置结束-->
+<!--记录微信分享开始-->
+<script type="text/javascript">
+    function share(openid, metaid, metatype, title, shareUrl) {
+		//alert("openid=" + openid + "，" + metaid + "，" + metatype + "，\n\rshareUrl=" + shareUrl);
+		if (!!openid && !!metaid && !!metatype && !!shareUrl) {
+			$.ajax({
+				url: "@Url.Action("share", "Academic", new { })",
+				type: "post",
+				dataType: "json",
+				timeout: 30000,
+				data: {
+				    openid: openid,
+					metaid: metaid,
+					metatype: metatype,
+					title: encodeURIComponent(title),
+					url: encodeURIComponent(shareUrl),
+					time: new Date().getTime()
+				},
+				success: function (result, textStatus) {
+					if (textStatus == "success" && !!result) {
+						//alert("分享（转发）成功");
+						if (result.errno == 0) {
+							//$.messager.alert("分享（转发）成功<br />" + result.errmsg, "", null, 2000);
+						}
+						else {
+							$.messager.alert("分享（转发）失败！<br />" + result.errmsg, "", null, 0);
+						}
+					}
+					else {
+						alert("分享（转发）失败！");
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					//alert(XMLHttpRequest.status);
+					//alert(XMLHttpRequest.readyState);
+					//alert(textStatus);
+					//alert('网络请求失败或超时请重新尝试');
+				},
+				complete: function (XMLHttpRequest, textStatus) {
+					//alert('执行完成了');
+				}
+			});
+		}
+		else {
+			//alert("分享（转发）方法参数错误！");
+		}
+	}
+</script>
+<!--记录微信分享结束-->
