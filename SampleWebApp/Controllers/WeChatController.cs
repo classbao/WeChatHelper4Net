@@ -116,6 +116,36 @@ namespace SampleWebApp.Controllers
                 return Content("创建自定义菜单 失败！");
             }
         }
+        /// <summary>
+        /// 查询当前使用的自定义菜单的结构：http://weixin.classbao.com/WeChat/GetMenu
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetMenu()
+        {
+            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string menuJson = Menu.GetMenu(access_token);
+            return Content(menuJson);
+        }
+        /// <summary>
+        /// 删除当前使用的自定义菜单：http://weixin.classbao.com/WeChat/DeleteMenu
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult DeleteMenu()
+        {
+            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string result = Menu.DeleteMenu(access_token);
+            return Content(result);
+        }
+        /// <summary>
+        /// 获取自定义菜单配置：http://weixin.classbao.com/WeChat/GetCurrentSelfMenu
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetCurrentSelfMenu()
+        {
+            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string menuJson = Menu.GetCurrentSelfMenu(access_token);
+            return Content(menuJson);
+        }
 
 
     }
