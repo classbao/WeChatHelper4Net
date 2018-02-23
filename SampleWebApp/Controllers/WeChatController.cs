@@ -59,6 +59,14 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult GetJSConfig()
         {
+            var jsConfig = Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
+            /*
+                jsConfig.appId
+                jsConfig.timestamp
+                jsConfig.nonceStr
+                jsConfig.signature
+            */
+
             return Content(JsonHelper.Serialize(Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri)));
         }
 

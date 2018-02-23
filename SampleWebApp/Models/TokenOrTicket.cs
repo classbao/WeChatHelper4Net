@@ -34,11 +34,11 @@ namespace SampleWebApp.Models
             {
                 //根据Token.appid将AccessToken插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
                 /*
-                 * return UpdateAccessTokenByCache(Token.appid, Token);
-                 * return UpdateAccessTokenByRedis(Token.appid, Token);
-                 * return UpdateAccessTokenByMemcache(Token.appid, Token);
-                 * return UpdateAccessTokenByMongodb(Token.appid, Token);
-                 * return UpdateAccessTokenByDB(Token.appid, Token);
+                 * return UpdateAccessTokenToCache(Token.appid, Token);
+                 * return UpdateAccessTokenToRedis(Token.appid, Token);
+                 * return UpdateAccessTokenToMemcache(Token.appid, Token);
+                 * return UpdateAccessTokenToMongodb(Token.appid, Token);
+                 * return UpdateAccessTokenToDB(Token.appid, Token);
                  * ……
                  */
 
@@ -65,19 +65,19 @@ namespace SampleWebApp.Models
         /// 用户自定义获取JSApiTicket
         /// </summary>
         /// <returns></returns>
-        public static JSApiTicketCacheModel GetJSApiTicket()
+        private static JSApiTicketCacheModel GetJSApiTicket()
         {
             JSSDK.GetJSApiTicketFromStorage get = delegate (DateTime Now, string AppId)
             {
                 //根据AppId从自定义存储库(接入者的DB、Cache、仓储源)获取JSApiTicket
                 /*
-                 * return GetJSApiTicketByCache(AppId);
-                 * return GetJSApiTicketByRedis(AppId);
-                 * return GetJSApiTicketByMemcache(AppId);
-                 * return GetJSApiTicketByMongodb(AppId);
-                 * return GetJSApiTicketByDB(AppId);
-                 * ……
-                 */
+                    * return GetJSApiTicketByCache(AppId);
+                    * return GetJSApiTicketByRedis(AppId);
+                    * return GetJSApiTicketByMemcache(AppId);
+                    * return GetJSApiTicketByMongodb(AppId);
+                    * return GetJSApiTicketByDB(AppId);
+                    * ……
+                    */
 
                 return null;
             };
@@ -85,13 +85,13 @@ namespace SampleWebApp.Models
             {
                 //根据Ticket.appid将JSApiTicket插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
                 /*
-                 * return UpdateJSApiTicketByCache(Ticket.appid, Ticket);
-                 * return UpdateJSApiTicketByRedis(Ticket.appid, Ticket);
-                 * return UpdateJSApiTicketByMemcache(Ticket.appid, Ticket);
-                 * return UpdateJSApiTicketByMongodb(Ticket.appid, Ticket);
-                 * return UpdateJSApiTicketByDB(Ticket.appid, Ticket);
-                 * ……
-                 */
+                    * return UpdateJSApiTicketToCache(Ticket.appid, Ticket);
+                    * return UpdateJSApiTicketToRedis(Ticket.appid, Ticket);
+                    * return UpdateJSApiTicketToMemcache(Ticket.appid, Ticket);
+                    * return UpdateJSApiTicketToMongodb(Ticket.appid, Ticket);
+                    * return UpdateJSApiTicketToDB(Ticket.appid, Ticket);
+                    * ……
+                    */
 
                 return true;
             };
@@ -100,10 +100,10 @@ namespace SampleWebApp.Models
             string appId = ConfigurationManager.AppSettings["WeChatAppId"].ToString(); //AppId为空时默认取配置文件appSettings节点key=WeChatAppId
             string access_token = TokenOrTicket.GetAccessToken().access_token;
 
-            var token = JSSDK.GetJSApiTicket(DateTime.Now, appId, access_token, get, update);
-            if(null != token)
+            var ticket = JSSDK.GetJSApiTicket(DateTime.Now, appId, access_token, get, update);
+            if(null != ticket)
             {
-                return token;
+                return ticket;
             }
             else
             {

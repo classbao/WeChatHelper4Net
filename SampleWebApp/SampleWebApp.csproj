@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\CustomData.xml" />
+    <Content Include="Content\jweixinHelper.js" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
