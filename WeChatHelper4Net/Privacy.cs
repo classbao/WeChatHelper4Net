@@ -34,6 +34,18 @@ namespace WeChatHelper4Net
 
         #region 微信公众号
         /// <summary>
+        /// 微信公众号域名（结尾不包含“/”）
+        /// </summary>
+        public static readonly string WeChatDomainName = ConfigHelper.GetAppSetting("WeChatDomainName");
+        /// <summary>
+        /// 公众微信号名称
+        /// </summary>
+        public static readonly string WeChatName = ConfigHelper.GetAppSetting("WeChatName");
+        /// <summary>
+        /// 公众微信号
+        /// </summary>
+        public static readonly string WeChatNumber = ConfigHelper.GetAppSetting("WeChatNumber");
+        /// <summary>
         /// 公众微信号（原始ID）
         /// </summary>
         public static readonly string WeChatId = ConfigHelper.GetAppSetting("WeChatId");

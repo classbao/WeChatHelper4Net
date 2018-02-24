@@ -31,6 +31,18 @@ namespace WeChatHelper4Net
 
         #region 公众微信号相关信息
         /// <summary>
+        /// 微信公众号域名（结尾不包含“/”）
+        /// </summary>
+        public static string WeChatDomainName { get { return Privacy.WeChatDomainName; } }
+        /// <summary>
+        /// 公众微信号名称
+        /// </summary>
+        public static string WeChatName { get { return Privacy.WeChatName; } }
+        /// <summary>
+        /// 公众微信号
+        /// </summary>
+        public static string WeChatNumber { get { return Privacy.WeChatNumber; } }
+        /// <summary>
         /// 公众微信号（原始ID）
         /// </summary>
         public static string WeChatId { get { return Privacy.WeChatId; } }
