@@ -116,12 +116,6 @@
     <Compile Include="XmlHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\XAWS\NewCidTech.Solution\CidTech.Solution\Bussiness\com.cidtechBiz.Activity\com.cidtechBiz.Activity.csproj">
-      <Project>{9b27fd88-dd72-44af-a129-9c4fa00c49c7}</Project>
-      <Name>com.cidtechBiz.Activity</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Crypto\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
