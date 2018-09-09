@@ -213,6 +213,21 @@ namespace WeChatHelper4Net
                         suffixName = GetSuffixNameByContentType(contentType);
                     else if(!string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
                         contentType = GetContentTypeBySuffixName(suffixName);
+                    if(string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
+                    {
+                        if("CropImage" == _filename)
+                        {
+                            suffixName = ".jpg";
+                            contentType = GetContentTypeBySuffixName(suffixName);
+                            fileName = "CropImage";
+                        }
+                        else if(!string.IsNullOrWhiteSpace(fileName))
+                        {
+                            suffixName = System.IO.Path.GetExtension(fileName).ToLower();
+                            contentType = GetContentTypeBySuffixName(suffixName);
+                            fileName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                        }
+                    }
 
                     fileName = !string.IsNullOrWhiteSpace(fileName) ? (fileName + suffixName)
                         : !string.IsNullOrWhiteSpace(_filename) ? _filename
@@ -282,7 +297,7 @@ namespace WeChatHelper4Net
         }
         #endregion
 
-        #region 类型转换
+        #region 多媒体文件类型与后缀名转换
         /// <summary>
         /// 根据后缀名获取ContentType。示例：.png返回：image/png
         /// </summary>
