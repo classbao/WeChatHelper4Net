@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using WeChatHelper4Net.Extend;
+using WeChatHelper4Net.Models.Multimedia;
 
 /*
  * 微信公众账号API
@@ -28,7 +30,7 @@ namespace WeChatHelper4Net
         /// <param name="fileSize">文件大小</param>
         /// <returns>多媒体保存路径</returns>
         [Obsolete("由于微信接口变更，该方法已过时")]
-        private static string DownloadMultimedia(string ACCESS_TOKEN, string MEDIA_ID, string physicalFolder,ref string fileName, out long fileSize)
+        private static string DownloadMultimedia(string ACCESS_TOKEN, string MEDIA_ID, string physicalFolder, ref string fileName, out long fileSize)
         {
             //LogHelper.Save("DownloadMultimedia > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，physicalFolder=" + physicalFolder + "，fileName=" + fileName, "DownloadMultimedia", LogType.Common, LogTime.day);
             fileSize = 0;
@@ -159,7 +161,13 @@ namespace WeChatHelper4Net
          */
 
         /// <summary>
-        /// 获取永久素材(除了图文)
+        /// 获取永久素材(除了图文，视频)
+        /// 公众号的素材库保存总数量有上限：图文消息素材、图片素材上限为5000，其他类型为1000。
+        /// 素材的格式大小等要求与公众平台官网一致：
+        /// 图片（image）: 2M，支持bmp/png/jpeg/jpg/gif格式
+        /// 语音（voice）：2M，播放长度不超过60s，mp3/wma/wav/amr格式
+        /// 视频（video）：10MB，支持MP4格式
+        /// 缩略图（thumb）：64KB，支持JPG格式
         /// </summary>
         /// <param name="ACCESS_TOKEN"></param>
         /// <param name="MEDIA_ID"></param>
@@ -174,7 +182,7 @@ namespace WeChatHelper4Net
             contentType = "";
 
             string strpath = string.Empty;
-            string stUrl = "https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=" + ACCESS_TOKEN;
+            string stUrl = Common.ApiUrl + "material/get_material?access_token=" + ACCESS_TOKEN;
             var jsonString = "{\"media_id\":\"" + MEDIA_ID + "\"}";
             byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
 
@@ -182,7 +190,8 @@ namespace WeChatHelper4Net
 
             System.Net.HttpWebRequest req = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(stUrl);
             req.Method = "POST";
-            req.Timeout = 5000;
+            req.Timeout = 30000;
+            req.KeepAlive = true;
             req.ContentLength = bytes.Length;
             req.GetRequestStream().Write(bytes, 0, bytes.Length);
 
@@ -200,25 +209,16 @@ namespace WeChatHelper4Net
                     //LogHelper.Save("接收信息：" + "StatusCode=" + myResponse.StatusCode.ToString() + "，StatusDescription=" + myResponse.StatusDescription + "，ContentType=" + myResponse.ContentType + "，Content-disposition=" + myResponse.GetResponseHeader("Content-disposition") + "，filename=" + _filename + "，suffixName=" + suffixName, nameof(Multimedia), LogType.Common, LogTime.day);
                     //接收信息：StatusCode=OK，StatusDescription=OK，ContentType=，Content-disposition=attachment; filename="8a125212e0a52c0c59d6cabcd2de18e8.jpg"，filename=8a125212e0a52c0c59d6cabcd2de18e8.jpg，suffixName=.jpg
 
-                    if(string.IsNullOrWhiteSpace(suffixName))
-                    {
-                        switch(myResponse.ContentType)
-                        {
-                            case "image/jpeg": suffixName = ".jpg"; break;
-                            case "application/x-jpg": suffixName = ".jpg"; break;
-                            case "image/png": suffixName = ".png"; break;
-                            case "application/x-png": suffixName = ".png"; break;
-                            case "audio/amr": suffixName = ".amr"; break;
-                            case "audio/mp3": suffixName = ".mp3"; break;
-                            case "video/mp4": suffixName = ".mp4"; break;
-                            default: suffixName = !string.IsNullOrWhiteSpace(suffixName) ? suffixName : ".jpg"; break;
-                        }
-                    }
+                    if(string.IsNullOrWhiteSpace(suffixName) && !string.IsNullOrWhiteSpace(contentType))
+                        suffixName = GetSuffixNameByContentType(contentType);
+                    else if(!string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
+                        contentType = GetContentTypeBySuffixName(suffixName);
+
                     fileName = !string.IsNullOrWhiteSpace(fileName) ? (fileName + suffixName)
                         : !string.IsNullOrWhiteSpace(_filename) ? _filename
                         : (MEDIA_ID + suffixName);
 
-
+                    //将输出流转换字节数组并返回
                     using(var rs = myResponse.GetResponseStream())
                     {
                         using(var ms = new MemoryStream())
@@ -241,6 +241,106 @@ namespace WeChatHelper4Net
             }
         }
 
+        /// <summary>
+        /// 获取永久素材(视频)
+        /// </summary>
+        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="MEDIA_ID"></param>
+        /// <returns></returns>
+        public static ForeverVideo GetForeverVideo(string ACCESS_TOKEN, string MEDIA_ID)
+        {
+            if(string.IsNullOrEmpty(MEDIA_ID)) return new ForeverVideo();
+            try
+            {
+                string url = Common.ApiUrl + string.Format("material/get_material?access_token={0}", ACCESS_TOKEN);
+                var jsonString = "{\"media_id\":\"" + MEDIA_ID + "\"}";
+                string result = HttpRequestHelper.Request(url, jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
+                //LogHelper.Save("GetForeverMultimediaVideoStream > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，result=" + result, nameof(Multimedia), LogType.Common, LogTime.day);
+                /*
+                 GetForeverMultimediaVideoStream > ACCESS_TOKEN=13_AS8GWsxovYZjCQtLN9CGDrsNCFJeWnEI9hSqX-b99agBMqH75oiZkRsS5b2GWs4AekEj2eKnw4cQcxhn-lafEGHT2Mk7CpwuznIFG05QfFML1Qn7L0uhsKzS7TGF6IxZ4RNb-dxBL3TMb8B4JXHiAFAXLV，MEDIA_ID=8DxY1tadrdbK7TQGFDwTzMNUaJUA79uPtoDPY_Qks4o，result={"title":"第一期-关闭分页预览","description":"","down_url":"http:\/\/mp.weixin.qq.com\/mp\/mp\/video?__biz=MzIxMzc4MTMzMA==&mid=100001728&sn=b9e6258f2abb37028af88bad81976879&vid=o1345teloaj&idx=1&vidsn=5efab83eb152c43d3cfff638d39cc909&fromid=1#rd"}
+                 */
+                if(!string.IsNullOrEmpty(result))
+                {
+                    return JsonHelper.DeSerialize<ForeverVideo>(StringHelper.RemoveSpecialChar(result));
+                }
+            }
+            catch(Exception Ex)
+            {
+                LogHelper.Save(Ex);
+                throw Ex;
+            }
+            return new ForeverVideo();
+        }
+        /// <summary>
+        /// 获取永久素材(图文)
+        /// 待完成
+        /// </summary>
+        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="MEDIA_ID"></param>
+        public static void GetForeverNews(string ACCESS_TOKEN, string MEDIA_ID)
+        {
+        }
         #endregion
+
+        #region 类型转换
+        /// <summary>
+        /// 根据后缀名获取ContentType。示例：.png返回：image/png
+        /// </summary>
+        /// <param name="suffixName"></param>
+        /// <returns></returns>
+        public static string GetContentTypeBySuffixName(string suffixName)
+        {
+            if(string.IsNullOrWhiteSpace(suffixName)) return "";
+            switch(suffixName.ToLower())
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg"; //"application/x-jpg"
+                case ".png":
+                    return "image/png"; //"application/x-png"
+                case ".bmp": return "application/x-bmp";
+                case ".gif": return "image/gif";
+
+                case ".amr": return "audio/amr";
+                case ".wma": return "audio/x-ms-wma";
+                case ".wav": return "audio/wav";
+                case ".mp3": return "audio/mp3";
+                case ".mp4": return "video/mp4"; //"video/mpeg4"
+
+                default: return "";
+            }
+        }
+        /// <summary>
+        /// 根据ContentType获取后缀名。示例：image/png返回：.png
+        /// </summary>
+        /// <param name="ContentType">示例：</param>
+        /// <returns></returns>
+        public static string GetSuffixNameByContentType(string ContentType)
+        {
+            switch(ContentType)
+            {
+                case "image/jpeg":
+                case "application/x-jpg":
+                    return ".jpg";
+                case "image/png":
+                case "application/x-png":
+                    return ".png";
+                case "application/x-bmp": return ".bmp";
+                //case "image/jpeg": suffixName = ".jpeg"; break;
+                case "image/gif": return ".gif";
+
+                case "audio/amr": return ".amr";
+                case "audio/x-ms-wma": return ".wma";
+                case "audio/wav": return ".wav";
+                case "audio/mp3": return ".mp3";
+                case "video/mp4":
+                case "video/mpeg4":
+                    return ".mp4";
+
+                default: return "";
+            }
+        }
+        #endregion
+
     }
 }
