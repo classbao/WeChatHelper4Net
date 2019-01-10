@@ -32,7 +32,7 @@ namespace SampleWebApp.Controllers
         /// 接收自定义通知的管理员OpenID
         /// </summary>
         private static string administratorOpenID = ConfigHelper.GetAppSetting("administratorOpenID");
-        private static string PaymentNoticeOpenID = ConfigHelper.GetAppSetting("PaymentNoticeOpenID");
+        private static string paymentNoticeOpenID = ConfigHelper.GetAppSetting("paymentNoticeOpenID");
 
         private static string showRequestResult(RequestResultBaseModel result)
         {
@@ -186,7 +186,7 @@ namespace SampleWebApp.Controllers
                                     }
                                     */
 
-                                    SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一条图片消息" + "\r\nMediaId=" + msg.MediaId + "\r\nPicUrl=" + msg.PicUrl, Models.TokenOrTicket.GetAccessToken().access_token);
+                                    SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一条图片消息" + "\r\nMediaId=" + msg.MediaId + "\r\nPicUrl=" + msg.PicUrl, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                     AsyncManager.OutstandingOperations.Decrement();
                                 });
                             }
@@ -204,7 +204,7 @@ namespace SampleWebApp.Controllers
                                 Task.Factory.StartNew(() =>
                                 {
                                     AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条语音消息", Models.TokenOrTicket.GetAccessToken().access_token);
+                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条语音消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                     AsyncManager.OutstandingOperations.Decrement();
                                 });
                             }
@@ -222,7 +222,7 @@ namespace SampleWebApp.Controllers
                                 Task.Factory.StartNew(() =>
                                 {
                                     AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条视频消息", Models.TokenOrTicket.GetAccessToken().access_token);
+                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条视频消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                     AsyncManager.OutstandingOperations.Decrement();
                                 });
                             }
@@ -240,7 +240,7 @@ namespace SampleWebApp.Controllers
                                 Task.Factory.StartNew(() =>
                                 {
                                     AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条小视频消息", Models.TokenOrTicket.GetAccessToken().access_token);
+                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条小视频消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                     AsyncManager.OutstandingOperations.Decrement();
                                 });
                             }
@@ -305,7 +305,7 @@ namespace SampleWebApp.Controllers
                                 Task.Factory.StartNew(() =>
                                 {
                                     AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条链接消息", Models.TokenOrTicket.GetAccessToken().access_token);
+                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条链接消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                     AsyncManager.OutstandingOperations.Decrement();
                                 });
                             }
@@ -336,7 +336,7 @@ namespace SampleWebApp.Controllers
                                                 AsyncManager.OutstandingOperations.Decrement();
 
                                                 AsyncManager.OutstandingOperations.Increment();
-                                                SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一个用户关注：\r\n" + msg.FromUserName, Models.TokenOrTicket.GetAccessToken().access_token);
+                                                SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一个用户关注：\r\n" + msg.FromUserName, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                                 AsyncManager.OutstandingOperations.Decrement();
                                             });
 
@@ -366,7 +366,7 @@ namespace SampleWebApp.Controllers
                                                 AsyncManager.OutstandingOperations.Decrement();
 
                                                 AsyncManager.OutstandingOperations.Increment();
-                                                SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一个扫码关注：\r\n" + msg.FromUserName, Models.TokenOrTicket.GetAccessToken().access_token);
+                                                SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一个扫码关注：\r\n" + msg.FromUserName, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                                 AsyncManager.OutstandingOperations.Decrement();
                                             });
 
@@ -489,7 +489,7 @@ namespace SampleWebApp.Controllers
                                             AsyncManager.OutstandingOperations.Decrement();
 
                                             //AsyncManager.OutstandingOperations.Increment();
-                                            SendMsg.SendText(msg.FromUserName, "您点击了菜单，EventKey=" + msg.EventKey, Models.TokenOrTicket.GetAccessToken().access_token);
+                                            SendMsg.SendText(msg.FromUserName, "您点击了菜单，EventKey=" + msg.EventKey, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                             //AsyncManager.OutstandingOperations.Decrement();
                                         });
                                     }
@@ -521,7 +521,7 @@ namespace SampleWebApp.Controllers
                                         Task.Factory.StartNew(() =>
                                         {
                                             AsyncManager.OutstandingOperations.Increment();
-                                            SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到事件推送群发结果：\r\n群发的结果：" + msg.Status + "\r\n粉丝数：" + msg.TotalCount + "\r\n准备发送的粉丝数：" + msg.FilterCount + "\r\n发送成功的粉丝数：" + msg.SentCount + "\r\n发送失败的粉丝数：" + msg.ErrorCount, Models.TokenOrTicket.GetAccessToken().access_token);
+                                            SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到事件推送群发结果：\r\n群发的结果：" + msg.Status + "\r\n粉丝数：" + msg.TotalCount + "\r\n准备发送的粉丝数：" + msg.FilterCount + "\r\n发送成功的粉丝数：" + msg.SentCount + "\r\n发送失败的粉丝数：" + msg.ErrorCount, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
                                             AsyncManager.OutstandingOperations.Decrement();
                                         });
                                     }
@@ -624,7 +624,7 @@ namespace SampleWebApp.Controllers
         public ActionResult MaintainLegalRights()
         {
             //log.Warn("MaintainLegalRights> 维权通知 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName);
-            SendMsg.SendText(administratorOpenID, DateTime.Now.ToString("yyyy年MM月 dd日HH时mm分") + "\r\n收到一条维权通知。", Models.TokenOrTicket.GetAccessToken().access_token);
+            SendMsg.SendText(administratorOpenID, DateTime.Now.ToString("yyyy年MM月 dd日HH时mm分") + "\r\n收到一条维权通知。", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
             return Content("");
         }
 
@@ -635,7 +635,7 @@ namespace SampleWebApp.Controllers
         public ActionResult WarningNotice()
         {
             //log.Warn("WarningNotice> 告警通知 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName);
-            SendMsg.SendText(administratorOpenID, DateTime.Now.ToString("yyyy年MM月 dd日HH时mm分") + "\r\n收到一条告警通知。", Models.TokenOrTicket.GetAccessToken().access_token);
+            SendMsg.SendText(administratorOpenID, DateTime.Now.ToString("yyyy年MM月 dd日HH时mm分") + "\r\n收到一条告警通知。", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
             return Content("");
         }
 
@@ -645,7 +645,7 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult GetAccessToken()
         {
-            var AccessToken = Models.TokenOrTicket.GetAccessToken();
+            var AccessToken = Models.WeChatTokenOrTicket.GetAccessToken();
             return Json(AccessToken);
         }
         /// <summary>
@@ -654,7 +654,7 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult GetJSConfig()
         {
-            var jsConfig = Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
+            var jsConfig = Models.WeChatTokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
             /*
                 jsConfig.appId
                 jsConfig.timestamp
@@ -662,7 +662,7 @@ namespace SampleWebApp.Controllers
                 jsConfig.signature
             */
 
-            return Content(JsonHelper.Serialize(Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri)));
+            return Content(JsonHelper.Serialize(Models.WeChatTokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri)));
         }
 
 
@@ -699,9 +699,8 @@ namespace SampleWebApp.Controllers
                         })
                 })
             });
-            string buttonJson = button.ToJson();
 
-            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string access_token = Models.WeChatTokenOrTicket.GetAccessToken().access_token;
             if(Menu.CreateMenu(button, access_token))
             {
                 return Content("创建自定义菜单 成功。");
@@ -717,7 +716,7 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult GetMenu()
         {
-            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string access_token = Models.WeChatTokenOrTicket.GetAccessToken().access_token;
             string menuJson = Menu.GetMenu(access_token);
             return Content(menuJson);
         }
@@ -727,7 +726,7 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult DeleteMenu()
         {
-            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string access_token = Models.WeChatTokenOrTicket.GetAccessToken().access_token;
             string result = Menu.DeleteMenu(access_token);
             return Content(result);
         }
@@ -737,7 +736,7 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult GetCurrentSelfMenu()
         {
-            string access_token = Models.TokenOrTicket.GetAccessToken().access_token;
+            string access_token = Models.WeChatTokenOrTicket.GetAccessToken().access_token;
             string menuJson = Menu.GetCurrentSelfMenu(access_token);
             return Content(menuJson);
         }

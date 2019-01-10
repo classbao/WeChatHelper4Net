@@ -12,7 +12,7 @@ namespace SampleWebApp.Models
     /// 用于微信WeChatHelper4Net调用用户自定义的票据存储
     /// 开源社区：https://github.com/classbao/WeChatHelper4Net
     /// </summary>
-    public class TokenOrTicket
+    public class WeChatTokenOrTicket
     {
         /// <summary>
         /// 用户自定义获取AccessToken
@@ -60,11 +60,14 @@ namespace SampleWebApp.Models
                  * ……
                  */
 
-                bool result;
-                // 先将票据存到自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）
-                result = Data.UpdateAccessTokenToRedis(Token.appid, Token);
-                // 为了避免快速数据丢失，再将票据存到自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）
-                result = Data.UpdateAccessTokenToDB(Token.appid, Token);
+                bool result = false;
+                if(null != Token && !string.IsNullOrWhiteSpace(Token.appid) && Token.expires_in > 60)
+                {
+                    // 先将票据存到自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）
+                    result = Data.UpdateAccessTokenToRedis(Token.appid, Token);
+                    // 为了避免快速数据丢失，再将票据存到自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）
+                    result = Data.UpdateAccessTokenToDB(Token.appid, Token);
+                }
 
                 return result;
             };
@@ -118,14 +121,17 @@ namespace SampleWebApp.Models
                     * ……
                     */
 
-                // 请自行实现（类似GetAccessToken()逻辑）
+                if(null != Ticket && !string.IsNullOrWhiteSpace(Ticket.appid) && Ticket.expires_in > 60)
+                {
+                    // 请自行实现（类似GetAccessToken()逻辑）
+                }
 
                 return true;
             };
 
 
             string appId = ConfigurationManager.AppSettings["WeChatAppId"].ToString(); //AppId为空时默认取配置文件appSettings节点key=WeChatAppId
-            string access_token = TokenOrTicket.GetAccessToken().access_token;
+            string access_token = WeChatTokenOrTicket.GetAccessToken().access_token;
 
             var ticket = JSSDK.GetJSApiTicket(DateTime.Now, appId, access_token, get, update);
             if(null != ticket)
@@ -148,7 +154,7 @@ namespace SampleWebApp.Models
         {
             string appId = ConfigurationManager.AppSettings["WeChatAppId"].ToString(); //AppId为空时默认取配置文件appSettings节点key=WeChatAppId
 
-            string jsapi_ticket = Models.TokenOrTicket.GetJSApiTicket().ticket;
+            string jsapi_ticket = Models.WeChatTokenOrTicket.GetJSApiTicket().ticket;
             var JsConfig = JSSDK.GetConfig(appId, jsapi_ticket, url);
             return JsConfig;
         }
