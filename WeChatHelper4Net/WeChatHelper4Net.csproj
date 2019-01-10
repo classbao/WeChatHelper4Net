@@ -54,6 +54,8 @@
     <Compile Include="Crypto\Sample.cs" />
     <Compile Include="Crypto\WXBizMsgCrypt.cs" />
     <Compile Include="CustomService\SendMsg.cs" />
+    <Compile Include="EncodingAESKey\Cryptography.cs" />
+    <Compile Include="EncodingAESKey\WXBizMsgCrypt.cs" />
     <Compile Include="Extend\ConfigHelper.cs" />
     <Compile Include="Extend\DictionaryExtend.cs" />
     <Compile Include="Extend\RandomCode.cs" />
@@ -121,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Crypto\Readme.txt" />
+    <Content Include="EncodingAESKey\Readme.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

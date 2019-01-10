@@ -680,7 +680,7 @@ namespace SampleWebApp.Controllers
             //    new View("xue", "bbb"),
             //});
             //string subbuttonJson = subbutton.ToJson();
-
+            
             var button = new Button(new List<WeChatHelper4Net.Models.Menu.Base.BaseButton>()
             {
                 new Click("今日歌曲", "V1001_TODAY_MUSIC"),
