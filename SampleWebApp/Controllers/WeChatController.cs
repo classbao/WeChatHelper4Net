@@ -644,7 +644,8 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult GetAccessToken()
         {
-            return Content(Models.TokenOrTicket.GetAccessToken().access_token);
+            var AccessToken = Models.TokenOrTicket.GetAccessToken();
+            return Json(AccessToken);
         }
         /// <summary>
         /// http://weixin.classbao.com/WeChat/GetJSConfig

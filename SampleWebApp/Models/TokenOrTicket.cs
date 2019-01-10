@@ -8,6 +8,9 @@ using WeChatHelper4Net.Models;
 
 namespace SampleWebApp.Models
 {
+    /// <summary>
+    /// 用于微信WeChatHelper4Net调用用户自定义的票据存储
+    /// </summary>
     public class TokenOrTicket
     {
         /// <summary>
@@ -28,6 +31,20 @@ namespace SampleWebApp.Models
                  * ……
                  */
 
+                AccessTokenCacheModel AccessToken = null;
+                // 先从自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）
+                AccessToken = Data.GetAccessTokenByRedis(AppId);
+                if(WeChatHelper4Net.AccessToken.CheckAccessToken(Now, AccessToken))
+                {
+                    return AccessToken;
+                }
+                // 如果快速数据没有，再从自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）
+                AccessToken = Data.GetAccessTokenByDB(AppId);
+                if(WeChatHelper4Net.AccessToken.CheckAccessToken(Now, AccessToken))
+                {
+                    return AccessToken;
+                }
+
                 return null;
             };
             AccessToken.UpdateAccessTokenToStorage update = delegate (DateTime now, AccessTokenCacheModel Token)
@@ -42,9 +59,14 @@ namespace SampleWebApp.Models
                  * ……
                  */
 
-                return true;
-            };
+                bool result;
+                // 先将票据存到自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）
+                result = Data.UpdateAccessTokenToRedis(Token.appid, Token);
+                // 为了避免快速数据丢失，再将票据存到自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）
+                result = Data.UpdateAccessTokenToDB(Token.appid, Token);
 
+                return result;
+            };
 
             string appId = ConfigurationManager.AppSettings["WeChatAppId"].ToString(); //AppId为空时默认取配置文件appSettings节点key=WeChatAppId
             string appSecret = ConfigurationManager.AppSettings["WeChatAppSecret"].ToString(); //AppSecret为空时默认取配置文件appSettings节点key=WeChatAppSecret
@@ -79,6 +101,8 @@ namespace SampleWebApp.Models
                     * ……
                     */
 
+                // 请自行实现（类似GetAccessToken()逻辑）
+
                 return null;
             };
             JSSDK.UpdateJSApiTicketToStorage update = delegate (DateTime now, JSApiTicketCacheModel Ticket)
@@ -92,6 +116,8 @@ namespace SampleWebApp.Models
                     * return UpdateJSApiTicketToDB(Ticket.appid, Ticket);
                     * ……
                     */
+
+                // 请自行实现（类似GetAccessToken()逻辑）
 
                 return true;
             };

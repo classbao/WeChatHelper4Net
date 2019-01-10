@@ -109,6 +109,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CustomWeChatShareData.cs" />
+    <Compile Include="Models\Data.cs" />
     <Compile Include="Models\TokenOrTicket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
