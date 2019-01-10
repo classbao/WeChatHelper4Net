@@ -10,6 +10,7 @@ namespace SampleWebApp.Models
 {
     /// <summary>
     /// 用于微信WeChatHelper4Net调用用户自定义的票据存储
+    /// 开源社区：https://github.com/classbao/WeChatHelper4Net
     /// </summary>
     public class TokenOrTicket
     {

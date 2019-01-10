@@ -17,6 +17,7 @@ namespace SampleWebApp.Controllers
 {
     /// <summary>
     /// 只用来用来与微信消息对接的控制器
+    /// 开源社区：https://github.com/classbao/WeChatHelper4Net
     /// </summary>
     public class WeChatController : Controller
     {
