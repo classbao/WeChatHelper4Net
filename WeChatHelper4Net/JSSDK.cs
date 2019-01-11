@@ -58,9 +58,10 @@ namespace WeChatHelper4Net
 
             string errorInfo = (string)CacheHelper.GetCache(keyState(AppId));
             if(!string.IsNullOrWhiteSpace(errorInfo) && errorInfo.Contains(Common.error))
-                throw new AggregateException(errorInfo);
+                throw new AggregateException(errorInfo + " 如果确认故障已解除，请回收应用程序池后再试");
 
-            if(GlobalFlag.Instance.wxJSApiTicket_IsBusy) return GetJSApiTicketFromWeChat(AppId, access_token);
+            if(GlobalFlag.Instance.wxJSApiTicket_IsBusy)
+                throw new ApplicationException("已经有一个请求正在进行，请稍后再试");
 
             //获取新票据
             string url = Common.ApiUrl + string.Format("ticket/getticket?access_token={0}&type=jsapi", access_token);

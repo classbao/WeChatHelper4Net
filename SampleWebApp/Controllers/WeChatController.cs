@@ -22,18 +22,18 @@ namespace SampleWebApp.Controllers
     public class WeChatController : Controller
     {
         // GET: WeChat
-
-        /// <summary>
-        /// 自定义Token
-        /// </summary>
-        private readonly string Token = "Token123ByClassbao"; // ConfigurationManager.AppSettings["WeChatToken"];
-
+        
         /// <summary>
         /// 接收自定义通知的管理员OpenID
         /// </summary>
         private static string administratorOpenID = ConfigHelper.GetAppSetting("administratorOpenID");
         private static string paymentNoticeOpenID = ConfigHelper.GetAppSetting("paymentNoticeOpenID");
 
+        /// <summary>
+        /// 自定义接收微信返回错误消息展示样式
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
         private static string showRequestResult(RequestResultBaseModel result)
         {
             if(result != null)
@@ -49,6 +49,9 @@ namespace SampleWebApp.Controllers
             return string.Empty;
         }
 
+        /// <summary>
+        /// 自定义订阅事件欢迎语
+        /// </summary>
         private static string AutoWelcomeMessage
         {
             get
@@ -82,7 +85,9 @@ namespace SampleWebApp.Controllers
         }
 
         /// <summary>
-        /// 响应消息推送，接收微信服务器推送来的请求或消息或事件或结果
+        /// 响应消息推送，接收微信服务器推送来的请求或消息或事件或结果。
+        /// 需同时支持接收HttpGet，HttpPost两种请求。
+        /// 需支持application/json，multipart/form-data，application/x-www-form-urlencoded，text/xml四种数据接收方式。
         /// </summary>
         /// <returns></returns>
         //[HttpGet, HttpPost]
@@ -97,6 +102,9 @@ namespace SampleWebApp.Controllers
                 var timestamp = Request["timestamp"];
                 var nonce = Request["nonce"];
                 var echostr = Request["echostr"];
+
+                // 自定义Token
+                string Token = ConfigHelper.GetAppSetting("WeChatToken");
 
                 var result = ValidationToken.Validation(signature, timestamp, nonce, echostr, Token);
                 if(!string.IsNullOrWhiteSpace(result))
@@ -616,14 +624,14 @@ namespace SampleWebApp.Controllers
 
             return Content(PassiveReply.ReplyEmpty());
         }
-        
+
         /// <summary>
         /// 维权通知
         /// </summary>
         /// <returns></returns>
         public ActionResult MaintainLegalRights()
         {
-            //log.Warn("MaintainLegalRights> 维权通知 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName);
+            LogHelper.Save("MaintainLegalRights> 维权通知 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName, nameof(WeChatController) + "-Warn", LogType.Report, LogTime.day);
             SendMsg.SendText(administratorOpenID, DateTime.Now.ToString("yyyy年MM月 dd日HH时mm分") + "\r\n收到一条维权通知。", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
             return Content("");
         }
@@ -634,10 +642,12 @@ namespace SampleWebApp.Controllers
         /// <returns></returns>
         public ActionResult WarningNotice()
         {
-            //log.Warn("WarningNotice> 告警通知 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName);
+            LogHelper.Save("WarningNotice> 告警通知 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName, nameof(WeChatController) + "-Warn", LogType.Report, LogTime.day);
             SendMsg.SendText(administratorOpenID, DateTime.Now.ToString("yyyy年MM月 dd日HH时mm分") + "\r\n收到一条告警通知。", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
             return Content("");
         }
+
+        #region 获取 AccessToken 与 jsConfig
 
         /// <summary>
         /// http://weixin.classbao.com/WeChat/GetAccessToken
@@ -646,7 +656,7 @@ namespace SampleWebApp.Controllers
         public ActionResult GetAccessToken()
         {
             var AccessToken = Models.WeChatTokenOrTicket.GetAccessToken();
-            return Json(AccessToken);
+            return Json(AccessToken, JsonRequestBehavior.AllowGet);
         }
         /// <summary>
         /// http://weixin.classbao.com/WeChat/GetJSConfig
@@ -662,9 +672,12 @@ namespace SampleWebApp.Controllers
                 jsConfig.signature
             */
 
-            return Content(JsonHelper.Serialize(Models.WeChatTokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri)));
+            return Json(jsConfig, JsonRequestBehavior.AllowGet);
         }
 
+        #endregion
+
+        #region 自定义菜单
 
         /// <summary>
         /// 创建自定义菜单：http://weixin.classbao.com/WeChat/CreateMenu
@@ -680,7 +693,7 @@ namespace SampleWebApp.Controllers
             //    new View("xue", "bbb"),
             //});
             //string subbuttonJson = subbutton.ToJson();
-            
+
             var button = new Button(new List<WeChatHelper4Net.Models.Menu.Base.BaseButton>()
             {
                 new Click("今日歌曲", "V1001_TODAY_MUSIC"),
@@ -741,6 +754,161 @@ namespace SampleWebApp.Controllers
             return Content(menuJson);
         }
 
+        #endregion
+
+        #region 微信网页授权
+        /*
+         * 如果用户在微信客户端中访问第三方网页，公众号可以通过微信网页授权机制，来获取用户基本信息，进而实现业务逻辑。
+         */
+
+        /// <summary>
+        /// 微信网页授权引导链接
+        /// 示例：http://machineroomcheckwork.94lss.com/WeChat/WeChat/OAuth2BootLink?returnUrl=http://machineroomcheckwork.94lss.com/WeChat/WeChat/TestReturnUrl
+        /// </summary>
+        /// <param name="returnUrl">授权后重定向的回调链接地址（需要授权的页面地址）</param>
+        /// <param name="state">重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值，最多128字节</param>
+        /// <returns></returns>
+        public ActionResult OAuth2BootLink(string returnUrl, string state = "")
+        {
+            if(string.IsNullOrWhiteSpace(state))
+            {
+                state = "myState-" + DateTime.Now.Millisecond; // 随机数，用于识别请求可靠性
+                Session["State"] = state;//储存随机数到Session
+            }
+
+            string url = "";
+            //url = OAuth.OAuthToURL(WeChatHelper4Net.Common.WeChatDomainName + "/WeChat/WeChat/BaseCallback/?returnUrl=" + System.Web.HttpUtility.UrlEncode(returnUrl), state, scope.snsapi_base); // snsapi_base （不弹出授权页面，直接跳转，只能获取用户openid）
+            url = OAuth.OAuthToURL(WeChatHelper4Net.Common.WeChatDomainName + "/WeChat/WeChat/UserInfoCallback/?returnUrl=" + System.Web.HttpUtility.UrlEncode(returnUrl), state, scope.snsapi_userinfo); // snsapi_userinfo （弹出授权页面，可通过openid拿到昵称、性别、所在地。并且， 即使在未关注的情况下，只要用户授权，也能获取其信息 ）
+
+            return Redirect(url);
+        }
+
+        /// <summary>
+        /// snsapi_base授权方式回传
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="state"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
+        public ActionResult BaseCallback(string code, string state, string returnUrl)
+        {
+            if(string.IsNullOrEmpty(code))
+            {
+                return Content("您拒绝了授权！");
+            }
+
+            if(state != Session["State"] as string)
+            {
+                //这里的state其实是会暴露给客户端的，验证能力很弱，这里只是演示一下，
+                //建议用完之后就清空，将其一次性使用
+                //实际上可以存任何想传递的数据，比如用户ID，并且需要结合例如下面的Session["OAuthAccessToken"]进行验证
+                return Content("验证失败！请从正规途径进入！");
+            }
+
+            //通过，用code换取access_token
+            var result = OAuth.GetAccessToken(code);
+            if(result.errcode != 0 || string.IsNullOrWhiteSpace(result.openid))
+            {
+                return Content("错误：" + result.errmsg);
+            }
+
+            //下面2个数据也可以自己封装成一个类，储存在数据库中（建议结合缓存）
+            //如果可以确保安全，可以将access_token存入用户的cookie中，每一个人的access_token是不一样的
+            Session["OAuthAccessTokenStartTime"] = DateTime.Now;
+            Session["OAuthAccessToken"] = result;
+
+            Session["openid"] = result.openid;
+
+            //因为这里还不确定用户是否关注本微信，所以只能试探性地获取一下
+            UserInfo userInfo = null;
+            try
+            {
+                //已关注，可以得到详细信息
+                userInfo = OAuth.GetUserInfo(result.access_token, result.openid);
+
+            }
+            catch(Exception ex)
+            {
+                //未关注，只能授权，无法得到详细信息
+                //这里的 ex.JsonResult 可能为："{\"errcode\":40003,\"errmsg\":\"invalid openid\"}"
+                //return Content("用户已授权，授权Token：" + JsonHelper.Serialize(result));
+            }
+
+            return Redirect(returnUrl);
+        }
+
+        /// <summary>
+        /// snsapi_userinfo授权方式回传
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="state"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
+        public ActionResult UserInfoCallback(string code, string state, string returnUrl)
+        {
+            if(string.IsNullOrEmpty(code))
+            {
+                return Content("您拒绝了授权！");
+            }
+
+            if(state != Session["State"] as string)
+            {
+                //这里的state其实是会暴露给客户端的，验证能力很弱，这里只是演示一下，
+                //建议用完之后就清空，将其一次性使用
+                //实际上可以存任何想传递的数据，比如用户ID，并且需要结合例如下面的Session["OAuthAccessToken"]进行验证
+                return Content("验证失败！请从正规途径进入！");
+            }
+
+            //通过，用code换取access_token
+            var result = OAuth.GetAccessToken(code);
+            if(result.errcode != 0 || string.IsNullOrWhiteSpace(result.openid))
+            {
+                return Content("错误：" + result.errmsg);
+            }
+
+            //下面2个数据也可以自己封装成一个类，储存在数据库中（建议结合缓存）
+            //如果可以确保安全，可以将access_token存入用户的cookie中，每一个人的access_token是不一样的
+            Session["OAuthAccessTokenStartTime"] = DateTime.Now;
+            Session["OAuthAccessToken"] = result;
+
+            Session["openid"] = result.openid;
+
+            //因为第一步选择的是OAuthScope.snsapi_userinfo，这里可以进一步获取用户详细信息
+            UserInfo userInfo = null;
+            try
+            {
+                //已授权，可以得到详细信息
+                userInfo = OAuth.GetUserInfo(result.access_token, result.openid);
+
+            }
+            catch(Exception ex)
+            {
+                return Content(ex.Message);
+            }
+
+            return Redirect(returnUrl);
+        }
+
+        /// <summary>
+        /// 测试ReturnUrl
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult TestReturnUrl()
+        {
+            string msg = "OAuthAccessTokenStartTime：" + Session["OAuthAccessTokenStartTime"];
+            //注意：OAuthAccessTokenStartTime这里只是为了方便识别和演示，
+            //OAuthAccessToken千万千万不能传输到客户端！
+
+            msg += "<br /><br />" + "openid：" + Session["openid"];
+
+            msg += "<br /><br />" +
+                   "此页面为returnUrl功能测试页面，可以进行刷新（或后退），不会得到code不可用的错误。<br />测试不带returnUrl效果，请" +
+                   string.Format("<a href=\"{0}\">点击这里</a>。", Url.Action("Index"));
+
+            return Content(msg);
+        }
+
+        #endregion
 
         #region 多媒体文件
         /// <summary>

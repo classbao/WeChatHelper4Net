@@ -103,6 +103,7 @@ namespace WeChatHelper4Net
 
             string url = string.Format("https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}&lang={2}", access_token, openid, lang);
             string result = HttpRequestHelper.Request(url);
+            // {"openid":"od2Uu1IvIX1ypbmqnkqGTKNtHBXQ","nickname":"熊仔其人","sex":1,"language":"zh_CN","city":"海淀","province":"北京","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKOticpMHZNfGZstl5MNz9sqFwQ9bSmNbF2T2f9qlfb3mcx8pVnF7jwODBTVnNdBxekR77QBiaCLTNA\/132","privilege":[]}
             UserInfo resultEntity = JsonHelper.DeSerialize<UserInfo>(result);
             return resultEntity;
         }

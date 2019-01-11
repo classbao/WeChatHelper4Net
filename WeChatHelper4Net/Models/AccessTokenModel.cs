@@ -83,6 +83,8 @@ namespace WeChatHelper4Net.Models
 
         [DataMember(IsRequired = true)]
         public int sex { get; set; }
+        [DataMember(IsRequired = true)]
+        public string language { get; set; }
 
         [DataMember(IsRequired = true)]
         public string province { get; set; }
@@ -102,8 +104,12 @@ namespace WeChatHelper4Net.Models
         [DataMember(IsRequired = true)]
         public List<string> privilege { get; set; }
 
-        [DataMember(IsRequired = true)]
+        /// <summary>
+        /// 绑定开放平台后才会有UnionID
+        /// </summary>
+        [DataMember(IsRequired = false)]
         public string unionid { get; set; }
+
     }
 
 
