@@ -818,6 +818,7 @@ namespace SampleWebApp.Controllers
             Session["OAuthAccessToken"] = result;
 
             Session["openid"] = result.openid;
+            Session["unionid"] = result.unionid;
 
             //因为这里还不确定用户是否关注本微信，所以只能试探性地获取一下
             UserInfo userInfo = null;
@@ -872,6 +873,7 @@ namespace SampleWebApp.Controllers
             Session["OAuthAccessToken"] = result;
 
             Session["openid"] = result.openid;
+            Session["unionid"] = result.unionid;
 
             //因为第一步选择的是OAuthScope.snsapi_userinfo，这里可以进一步获取用户详细信息
             UserInfo userInfo = null;
@@ -899,7 +901,7 @@ namespace SampleWebApp.Controllers
             //注意：OAuthAccessTokenStartTime这里只是为了方便识别和演示，
             //OAuthAccessToken千万千万不能传输到客户端！
 
-            msg += "<br /><br />" + "openid：" + Session["openid"];
+            msg += "<br /><br />" + "openid：" + Session["openid"] + "，unionid：" + Session["unionid"];
 
             msg += "<br /><br />" +
                    "此页面为returnUrl功能测试页面，可以进行刷新（或后退），不会得到code不可用的错误。<br />测试不带returnUrl效果，请" +
