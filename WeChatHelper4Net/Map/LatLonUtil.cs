@@ -84,7 +84,7 @@ namespace WeChatHelper4Net.Map
         /// <param name="lat">纬度</param>
         /// <param name="lon">经度</param>
         /// <returns></returns>
-        public static LatLon gps84_To_Gcj02(double lat, double lon)
+        public static LatLon wgs84_To_Gcj02(double lat, double lon)
         {
             if(outOfChina(lat, lon))
             {
@@ -115,7 +115,7 @@ namespace WeChatHelper4Net.Map
         /// <param name="lat"></param>
         /// <param name="lon"></param>
         /// <returns></returns>
-        public static LatLon gcj_To_Gps84(double lat, double lon)
+        public static LatLon gcj_To_Wgs84(double lat, double lon)
         {
             LatLon gps = transform(lat, lon);
             double lontitude = lon * 2 - gps.getWgLon();
@@ -174,11 +174,11 @@ namespace WeChatHelper4Net.Map
          * @param bd_lon
          * @return
          */
-        public static LatLon bd09_To_Gps84(double bd_lat, double bd_lon)
+        public static LatLon bd09_To_Wgs84(double bd_lat, double bd_lon)
         {
 
             LatLon gcj02 = LatLonUtil.bd09_To_Gcj02(bd_lat, bd_lon);
-            LatLon map84 = LatLonUtil.gcj_To_Gps84(gcj02.getWgLat(),
+            LatLon map84 = LatLonUtil.gcj_To_Wgs84(gcj02.getWgLat(),
                     gcj02.getWgLon());
             return map84;
 
@@ -245,9 +245,9 @@ namespace WeChatHelper4Net.Map
         //    // 北斗芯片获取的经纬度为WGS84地理坐标 31.426896,119.496145
         //    LatLon gps = new LatLon(31.426896, 119.496145);
         //    Console.WriteLine("gps :" + gps);
-        //    LatLon gcj = gps84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
+        //    LatLon gcj = wgs84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
         //    Console.WriteLine("gcj :" + gcj);
-        //    LatLon star = gcj_To_Gps84(gcj.getWgLat(), gcj.getWgLon());
+        //    LatLon star = gcj_To_Wgs84(gcj.getWgLat(), gcj.getWgLon());
         //    Console.WriteLine("star:" + star);
         //    LatLon bd = gcj02_To_Bd09(gcj.getWgLat(), gcj.getWgLon());
         //    Console.WriteLine("bd  :" + bd);
