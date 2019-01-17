@@ -234,14 +234,14 @@ namespace WeChatHelper4Net.Map
 		/// bd09ll（百度经纬度坐标）
 		/// </summary>
 		bd09ll,
-		/// <summary>
-		/// gcj02ll（国测局经纬度坐标）
+        /// <summary>
+        /// gcj02ll（国测局经纬度坐标，又叫火星坐标系统，是加密插件）GCJ-02是由中国国家测绘局（G表示Guojia国家，C表示Cehui测绘，J表示Ju局）制订的地理信息系统的坐标系统。它是一种对经纬度数据的加密算法，即加入随机的偏差。国内出版的各种地图系统（包括电子形式），必须至少采用GCJ-02对地理位置进行首次加密。
 		/// </summary>
 		gcj02ll,
-		/// <summary>
-		/// wgs84ll（ GPS经纬度）
-		/// </summary>
-		wgs84ll,
+        /// <summary>
+        /// wgs84ll（ GPS经纬度）WGS84:World Geodetic System 1984，是为GPS全球定位系统使用而建立的坐标系统。
+        /// </summary>
+        wgs84ll,
 	}
 
 }
