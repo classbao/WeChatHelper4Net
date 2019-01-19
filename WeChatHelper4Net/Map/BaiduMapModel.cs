@@ -45,7 +45,7 @@ namespace WeChatHelper4Net.Map
 		/// <summary>
 		/// poi经纬度坐标 
 		/// </summary>
-		public BaiduMapLocation location { get; set; }
+		public BaiduMapPoint location { get; set; }
 		/// <summary>
 		/// poi地址信息 
 		/// </summary>
@@ -77,7 +77,7 @@ namespace WeChatHelper4Net.Map
 		/// <summary>
 		/// 经纬度坐标
 		/// </summary>
-		public BaiduMapLocation location { get; set; }
+		public BaiduMapPoint location { get; set; }
 		/// <summary>
 		/// 位置的附加信息，是否精确查找。1为精确查找，0为不精确。
 		/// </summary>
@@ -100,31 +100,33 @@ namespace WeChatHelper4Net.Map
 		public int status { get; set; }
 		public BaiduMapGeocoderReverseResultItemModel result { get; set; }
 	}
-	public class BaiduMapGeocoderReverseResultItemModel
-	{
-		/// <summary>
-		/// 经纬度坐标
-		/// </summary>
-		public BaiduMapLocation location { get; set; }
-		/// <summary>
-		/// 结构化地址信息
-		/// </summary>
-		public string formatted_address { get; set; }
-		/// <summary>
-		/// 所在商圈信息，如 "人民大学,中关村,苏州街" 
-		/// </summary>
-		public string business { get; set; }
+    public class BaiduMapGeocoderReverseResultItemModel
+    {
+        /// <summary>
+        /// 经纬度坐标
+        /// </summary>
+        public BaiduMapPoint location { get; set; }
+        /// <summary>
+        /// 结构化地址信息
+        /// </summary>
+        public string formatted_address { get; set; }
+        /// <summary>
+        /// 所在商圈信息，如 "人民大学,中关村,苏州街" 
+        /// </summary>
+        public string business { get; set; }
 
-		public addressComponent addressComponent { get; set; }
-		public List<pois> poiRegions { get; set; }
+        public addressComponent addressComponent { get; set; }
+        public List<pois> pois { get; set; }
+        public List<object> roads { get; set; }
+        public List<pois> poiRegions { get; set; }
 
-		/// <summary>
-		/// 当前位置结合POI的语义化结果描述。 
-		/// </summary>
-		public string sematic_description { get; set; }
+        /// <summary>
+        /// 当前位置结合POI的语义化结果描述。 
+        /// </summary>
+        public string sematic_description { get; set; }
 
-		public int cityCode { get; set; }
-	}
+        public int cityCode { get; set; }
+    }
 
 	public class addressComponent
 	{
@@ -165,64 +167,108 @@ namespace WeChatHelper4Net.Map
 		/// </summary>
 		public string distance { get; set; }
 	}
-	public class pois
-	{
-		/// <summary>
-		/// 地址信息
-		/// </summary>
-		public string addr { get; set; }
-		/// <summary>
-		/// 数据来源
-		/// </summary>
-		public string cp { get; set; }
-		/// <summary>
-		/// 和当前坐标点的方向
-		/// </summary>
-		public string direction { get; set; }
-		/// <summary>
-		/// 离坐标点距离
-		/// </summary>
-		public string distance { get; set; }
-		/// <summary>
-		/// poi名称 
-		/// </summary>
-		public string name { get; set; }
-		/// <summary>
-		/// poi类型，如’ 办公大厦,商务大厦’
-		/// </summary>
-		public string poiType { get; set; }
-		/// <summary>
-		/// poi坐标{x,y} 
-		/// </summary>
-		public string point { get; set; }
-		/// <summary>
-		/// 电话
-		/// </summary>
-		public string tel { get; set; }
-		/// <summary>
-		/// poi唯一标识
-		/// </summary>
-		public string uid { get; set; }
-		/// <summary>
-		/// 邮编
-		/// </summary>
-		public string zip { get; set; }
-	}
+    public class pois
+    {
+        /// <summary>
+        /// 地址信息
+        /// </summary>
+        public string addr { get; set; }
+        /// <summary>
+        /// 数据来源
+        /// </summary>
+        public string cp { get; set; }
+        /// <summary>
+        /// 和当前坐标点的方向
+        /// </summary>
+        public string direction { get; set; }
+        /// <summary>
+        /// 离坐标点距离
+        /// </summary>
+        public string distance { get; set; }
+        /// <summary>
+        /// poi名称 
+        /// </summary>
+        public string name { get; set; }
+        /// <summary>
+        /// poi类型，如’ 办公大厦,商务大厦’
+        /// </summary>
+        public string poiType { get; set; }
+        /// <summary>
+        /// poi坐标{x,y} 
+        /// </summary>
+        public poisPoint point { get; set; }
+        /// <summary>
+        /// 电话
+        /// </summary>
+        public string tel { get; set; }
+        /// <summary>
+        /// poi唯一标识
+        /// </summary>
+        public string uid { get; set; }
+        /// <summary>
+        /// 邮编
+        /// </summary>
+        public string zip { get; set; }
+        public pois parent_poi { get; set; }
 
-	/// <summary>
-	/// 百度地图经纬度坐标 
-	/// </summary>
-	public class BaiduMapLocation
-	{
-		/// <summary>
-		/// 纬度值 
-		/// </summary>
-		public float lat { get; set; }
-		/// <summary>
-		/// 经度值 
-		/// </summary>
-		public float lng { get; set; }
-	}
+        public string direction_desc { get; set; }
+        public string tag { get; set; }
+
+    }
+    public class poisPoint
+    {
+        /// <summary>
+        /// 纬度值 
+        /// </summary>
+        public float y { get; set; }
+        /// <summary>
+        /// 经度值 
+        /// </summary>
+        public float x { get; set; }
+
+        #region 构造函数
+        public poisPoint() { }
+        public poisPoint(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        #endregion
+    }
+
+    /// <summary>
+    /// 百度地图经纬度坐标 
+    /// </summary>
+    public class BaiduMapPoint
+    {
+        /// <summary>
+        /// 纬度值 
+        /// </summary>
+        public float lat { get; set; }
+        /// <summary>
+        /// 经度值 
+        /// </summary>
+        public float lng { get; set; }
+
+
+        #region 构造函数
+        /// <summary>
+        /// 百度地图经纬度坐标
+        /// </summary>
+        public BaiduMapPoint() { }
+        /// <summary>
+        /// 百度地图经纬度坐标
+        /// </summary>
+        /// <param name="lng">经度值</param>
+        /// <param name="lat">纬度值</param>
+        public BaiduMapPoint(float lng, float lat)
+        {
+            this.lng = lng;
+            this.lat = lat;
+        } 
+        #endregion
+
+    }
 
 	/// <summary>
 	/// 百度地图逆地理编码服务

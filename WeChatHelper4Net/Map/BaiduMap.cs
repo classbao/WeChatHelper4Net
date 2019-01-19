@@ -65,22 +65,22 @@ namespace WeChatHelper4Net.Map
 			return null;
 		}
 
-		/// <summary>
-		/// 逆地理编码，即逆地址解析，由百度经纬度信息得到结构化地址信息。例如：“lat:31.325152,lng:120.558957”逆地址解析的结果是“江苏省苏州市虎丘区塔园路318号”。 
-		/// </summary>
-		/// <param name="ak"></param>
-		/// <param name="location"></param>
-		/// <param name="coordtype">坐标的类型，目前支持的坐标类型包括：bd09ll（百度经纬度坐标）、gcj02ll（国测局经纬度坐标）、wgs84ll（ GPS经纬度）</param>
-		/// <param name="pois">是否显示指定位置周边的poi，0为不显示，1为显示。当值为1时，显示周边100米内的poi</param>
-		/// <returns></returns>
-		public static BaiduMapGeocoderReverseResultModel GeocoderReverse(string ak, BaiduMapLocation location, coordtype coordtype = coordtype.bd09ll, int pois = 0)
+        /// <summary>
+        /// 逆地理编码，即逆地址解析，由百度经纬度信息得到结构化地址信息。例如：“lat:31.325152,lng:120.558957”逆地址解析的结果是“江苏省苏州市虎丘区塔园路318号”。 
+        /// </summary>
+        /// <param name="ak"></param>
+        /// <param name="point"></param>
+        /// <param name="coordtype">坐标的类型，目前支持的坐标类型包括：bd09ll（百度经纬度坐标）、gcj02ll（国测局经纬度坐标）、wgs84ll（ GPS经纬度）</param>
+        /// <param name="pois">是否显示指定位置周边的poi，0为不显示，1为显示。当值为1时，显示周边100米内的poi</param>
+        /// <returns></returns>
+        public static BaiduMapGeocoderReverseResultModel GeocoderReverse(string ak, BaiduMapPoint point, coordtype coordtype = coordtype.bd09ll, int pois = 0)
 		{
-			string _location = string.Format("{0},{1}", location.lat, location.lng);
+			string _point = string.Format("{0},{1}", point.lat, point.lng);
 			string url = string.Format("http://api.map.baidu.com/geocoder/v2/?output=json&ak={0}&coordtype={1}&location={2}&pois={3}"
 				, ak
 				, coordtype.ToString()
-				, _location
-				, pois
+				, _point
+                , pois
 				);
 			string geocoder = HttpGet(url);
 			if (!string.IsNullOrWhiteSpace(geocoder))
