@@ -149,6 +149,216 @@ namespace WeChatHelper4Net
         #endregion
 
         #region 获取素材
+        /// <summary>
+        /// 获取临时素材(除了图文，视频，语音)
+        /// 公众号可以使用本接口获取临时素材（即下载临时的多媒体文件）。请注意，视频文件不支持https下载，调用该接口需http协议。本接口即为原“下载多媒体文件”接口。
+        /// </summary>
+        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="MEDIA_ID"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileSize"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static byte[] GetTempMultimediaStream(string ACCESS_TOKEN, string MEDIA_ID, ref string fileName, out long fileSize, out string contentType)
+        {
+            LogHelper.Save("GetTempMultimediaStream > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，fileName=" + fileName, nameof(Multimedia), LogType.Common, LogTime.day);
+            fileSize = 0;
+            contentType = "";
+
+            string strpath = string.Empty;
+            string stUrl = Common.ApiUrl + string.Format("media/get?access_token={0}&media_id={1}", ACCESS_TOKEN, MEDIA_ID);
+            var jsonString = "";
+            byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
+
+            string suffixName = string.Empty;
+
+            System.Net.HttpWebRequest req = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(stUrl);
+            req.Method = "GET";
+            req.Timeout = 30000;
+            req.KeepAlive = true;
+            req.ContentLength = bytes.Length;
+            req.GetRequestStream().Write(bytes, 0, bytes.Length);
+
+            try
+            {
+                using(System.Net.WebResponse wr = req.GetResponse())
+                {
+                    System.Net.HttpWebResponse myResponse = (System.Net.HttpWebResponse)req.GetResponse();
+                    strpath = myResponse.ResponseUri.ToString();
+                    fileSize = myResponse.ContentLength;
+                    contentType = myResponse.ContentType;
+                    string _filename = Common.Replace(myResponse.GetResponseHeader("Content-disposition"), ".*filename=\"", "").Trim(new Char[] { '"' });
+                    suffixName = System.IO.Path.GetExtension(_filename).ToLower();
+
+                    LogHelper.Save("接收信息：" + "StatusCode=" + myResponse.StatusCode.ToString() + "，StatusDescription=" + myResponse.StatusDescription + "，ContentType=" + myResponse.ContentType + "，Content-disposition=" + myResponse.GetResponseHeader("Content-disposition") + "，filename=" + _filename + "，suffixName=" + suffixName, nameof(Multimedia), LogType.Common, LogTime.day);
+                    //接收信息：StatusCode=OK，StatusDescription=OK，ContentType=，Content-disposition=attachment; filename="8a125212e0a52c0c59d6cabcd2de18e8.jpg"，filename=8a125212e0a52c0c59d6cabcd2de18e8.jpg，suffixName=.jpg
+
+                    if(string.IsNullOrWhiteSpace(suffixName) && !string.IsNullOrWhiteSpace(contentType))
+                        suffixName = GetSuffixNameByContentType(contentType);
+                    else if(!string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
+                        contentType = GetContentTypeBySuffixName(suffixName);
+                    if(string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
+                    {
+                        if("CropImage" == _filename)
+                        {
+                            suffixName = ".jpg";
+                            contentType = GetContentTypeBySuffixName(suffixName);
+                            fileName = "CropImage";
+                        }
+                        else if(!string.IsNullOrWhiteSpace(fileName))
+                        {
+                            suffixName = System.IO.Path.GetExtension(fileName).ToLower();
+                            contentType = GetContentTypeBySuffixName(suffixName);
+                            fileName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                        }
+                    }
+
+                    fileName = !string.IsNullOrWhiteSpace(fileName) ? (fileName + suffixName)
+                        : !string.IsNullOrWhiteSpace(_filename) ? _filename
+                        : (MEDIA_ID + suffixName);
+
+                    //将输出流转换字节数组并返回
+                    using(var rs = myResponse.GetResponseStream())
+                    {
+                        using(var ms = new MemoryStream())
+                        {
+                            rs.CopyTo(ms);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            int buffsize = (int)ms.Length; //rs.Length 此流不支持查找,先转为MemoryStream
+                            byte[] rsBytes = new byte[buffsize];
+                            ms.Read(rsBytes, 0, buffsize);
+                            return rsBytes;
+                        }
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                //LogHelper.Save(ex, "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID, nameof(Multimedia), LogTime.day);
+                throw ex;
+            }
+        }
+        /// <summary>
+        /// 获取永久素材(临时)
+        /// </summary>
+        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="MEDIA_ID"></param>
+        /// <returns></returns>
+        public static TempVideo GetTempVideo(string ACCESS_TOKEN, string MEDIA_ID)
+        {
+            if(string.IsNullOrEmpty(MEDIA_ID)) return new TempVideo();
+            try
+            {
+                string url = Common.ApiUrl + string.Format("media/get?access_token={0}&media_id={1}", ACCESS_TOKEN, MEDIA_ID);
+                var jsonString = "";
+                string result = HttpRequestHelper.Request(url, jsonString, HttpRequestHelper.Method.GET, System.Text.Encoding.UTF8);
+                //LogHelper.Save("GetTempVideo > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，result=" + result, nameof(Multimedia), LogType.Common, LogTime.day);
+                if(!string.IsNullOrEmpty(result))
+                {
+                    return JsonHelper.DeSerialize<TempVideo>(StringHelper.RemoveSpecialChar(result));
+                }
+            }
+            catch(Exception Ex)
+            {
+                LogHelper.Save(Ex);
+                throw Ex;
+            }
+            return new TempVideo();
+        }
+        /// <summary>
+        /// 高清语音素材获取接口(临时)
+        /// 公众号可以使用本接口获取从JSSDK的uploadVoice接口上传的临时语音素材，格式为speex，16K采样率。该音频比上文的临时素材获取接口（格式为amr，8K采样率）更加清晰，适合用作语音识别等对音质要求较高的业务。
+        /// </summary>
+        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="MEDIA_ID"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileSize"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static byte[] GetTempVoiceMultimediaStream(string ACCESS_TOKEN, string MEDIA_ID, ref string fileName, out long fileSize, out string contentType)
+        {
+            //LogHelper.Save("GetTempVoiceMultimediaStream > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，fileName=" + fileName, nameof(Multimedia), LogType.Common, LogTime.day);
+            fileSize = 0;
+            contentType = "";
+
+            string strpath = string.Empty;
+            string stUrl = Common.ApiUrl + string.Format("media/get/jssdk?access_token={0}&media_id={1}", ACCESS_TOKEN, MEDIA_ID);
+            var jsonString = "";
+            byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
+
+            string suffixName = string.Empty;
+
+            System.Net.HttpWebRequest req = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(stUrl);
+            req.Method = "GET";
+            req.Timeout = 30000;
+            req.KeepAlive = true;
+            req.ContentLength = bytes.Length;
+            req.GetRequestStream().Write(bytes, 0, bytes.Length);
+
+            try
+            {
+                using(System.Net.WebResponse wr = req.GetResponse())
+                {
+                    System.Net.HttpWebResponse myResponse = (System.Net.HttpWebResponse)req.GetResponse();
+                    strpath = myResponse.ResponseUri.ToString();
+                    fileSize = myResponse.ContentLength;
+                    contentType = myResponse.ContentType;
+                    string _filename = Common.Replace(myResponse.GetResponseHeader("Content-disposition"), ".*filename=\"", "").Trim(new Char[] { '"' });
+                    suffixName = System.IO.Path.GetExtension(_filename).ToLower();
+
+                    //LogHelper.Save("接收信息：" + "StatusCode=" + myResponse.StatusCode.ToString() + "，StatusDescription=" + myResponse.StatusDescription + "，ContentType=" + myResponse.ContentType + "，Content-disposition=" + myResponse.GetResponseHeader("Content-disposition") + "，filename=" + _filename + "，suffixName=" + suffixName, nameof(Multimedia), LogType.Common, LogTime.day);
+                    //接收信息：StatusCode=OK，StatusDescription=OK，ContentType=，Content-disposition=attachment; filename="8a125212e0a52c0c59d6cabcd2de18e8.jpg"，filename=8a125212e0a52c0c59d6cabcd2de18e8.jpg，suffixName=.jpg
+
+                    if(string.IsNullOrWhiteSpace(suffixName) && !string.IsNullOrWhiteSpace(contentType))
+                        suffixName = GetSuffixNameByContentType(contentType);
+                    else if(!string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
+                        contentType = GetContentTypeBySuffixName(suffixName);
+                    if(string.IsNullOrWhiteSpace(suffixName) && string.IsNullOrWhiteSpace(contentType))
+                    {
+                        if("CropImage" == _filename)
+                        {
+                            suffixName = ".jpg";
+                            contentType = GetContentTypeBySuffixName(suffixName);
+                            fileName = "CropImage";
+                        }
+                        else if(!string.IsNullOrWhiteSpace(fileName))
+                        {
+                            suffixName = System.IO.Path.GetExtension(fileName).ToLower();
+                            contentType = GetContentTypeBySuffixName(suffixName);
+                            fileName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                        }
+                    }
+
+                    fileName = !string.IsNullOrWhiteSpace(fileName) ? (fileName + suffixName)
+                        : !string.IsNullOrWhiteSpace(_filename) ? _filename
+                        : (MEDIA_ID + suffixName);
+
+                    //将输出流转换字节数组并返回
+                    using(var rs = myResponse.GetResponseStream())
+                    {
+                        using(var ms = new MemoryStream())
+                        {
+                            rs.CopyTo(ms);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            int buffsize = (int)ms.Length; //rs.Length 此流不支持查找,先转为MemoryStream
+                            byte[] rsBytes = new byte[buffsize];
+                            ms.Read(rsBytes, 0, buffsize);
+                            return rsBytes;
+                        }
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                //LogHelper.Save(ex, "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID, nameof(Multimedia), LogTime.day);
+                throw ex;
+            }
+        }
+
+
+
         /*
             string fileName = "";
             long fileSize;
@@ -159,6 +369,7 @@ namespace WeChatHelper4Net
             _stream.Seek(0, System.IO.SeekOrigin.Begin);
             ClassLib4Net.LogHelper.Save("mediaId=" + mediaId + "，_stream.Length=" + _stream.Length + "，fileName=" + fileName + "，fileSize=" + fileSize + "，contentType=" + contentType, nameof(QRCodeController), ClassLib4Net.LogType.Common, ClassLib4Net.LogTime.hour);
          */
+
 
         /// <summary>
         /// 获取永久素材(除了图文，视频)

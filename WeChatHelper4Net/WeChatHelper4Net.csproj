@@ -83,6 +83,7 @@
     <Compile Include="Models\Menu\Button.cs" />
     <Compile Include="Models\MicroMessengerUserAgent.cs" />
     <Compile Include="Models\Multimedia\ForeverVideo.cs" />
+    <Compile Include="Models\Multimedia\TempVideo.cs" />
     <Compile Include="Models\NewsModel.cs" />
     <Compile Include="Models\PassiveReplyModel.cs" />
     <Compile Include="Models\PayModel.cs" />
