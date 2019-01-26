@@ -149,6 +149,37 @@ namespace WeChatHelper4Net
         #endregion
 
         #region 获取素材
+        /*
+         c# 将byte数组保存成图片
+        将byte数组保存成图片：
+
+        方式一：System.IO.File.WriteAllBytes(@"c:\test.jpg", bytes);
+
+        方式二：MemoryStream ms=new MemoryStream(Byte[] b);  把那个byte[]数组传进去,然后
+                   FileStream fs=new FileStream(路径 例如:"E:\image\1.jpg");
+        　　　　ms.writeto(fs);
+        　　　　ms.close();
+        　　　　fs.close();
+
+        方法三：
+
+               //得到图片地址
+               var stringFilePath = context.Server.MapPath(string.Format("~/Image/{0}{1}.jpg", imageName, id));
+               //声明一个FileStream用来将图片暂时放入流中
+               FileStream stream = new FileStream(stringFilePath, FileMode.Open);
+               using (stream)
+               {
+                   //透过GetImageFromStream方法将图片放入byte数组中
+                   byte[] imageBytes = this.GetImageFromStream(stream,context);
+                   //上下文确定写到客户短时的文件类型
+                   context.Response.ContentType = "image/jpeg";
+                   //上下文将imageBytes中的数据写到前段
+                   context.Response.BinaryWrite(imageBytes);
+                   stream.Close();
+                }
+        */
+
+
         /// <summary>
         /// 获取临时素材(除了图文，视频，语音)
         /// 公众号可以使用本接口获取临时素材（即下载临时的多媒体文件）。请注意，视频文件不支持https下载，调用该接口需http协议。本接口即为原“下载多媒体文件”接口。
@@ -161,14 +192,12 @@ namespace WeChatHelper4Net
         /// <returns></returns>
         public static byte[] GetTempMultimediaStream(string ACCESS_TOKEN, string MEDIA_ID, ref string fileName, out long fileSize, out string contentType)
         {
-            LogHelper.Save("GetTempMultimediaStream > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，fileName=" + fileName, nameof(Multimedia), LogType.Common, LogTime.day);
+            //LogHelper.Save("GetTempMultimediaStream > " + "ACCESS_TOKEN=" + ACCESS_TOKEN + "，MEDIA_ID=" + MEDIA_ID + "，fileName=" + fileName, nameof(Multimedia), LogType.Common, LogTime.day);
             fileSize = 0;
             contentType = "";
 
             string strpath = string.Empty;
             string stUrl = Common.ApiUrl + string.Format("media/get?access_token={0}&media_id={1}", ACCESS_TOKEN, MEDIA_ID);
-            var jsonString = "";
-            byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
 
             string suffixName = string.Empty;
 
@@ -176,8 +205,6 @@ namespace WeChatHelper4Net
             req.Method = "GET";
             req.Timeout = 30000;
             req.KeepAlive = true;
-            req.ContentLength = bytes.Length;
-            req.GetRequestStream().Write(bytes, 0, bytes.Length);
 
             try
             {
@@ -190,8 +217,8 @@ namespace WeChatHelper4Net
                     string _filename = Common.Replace(myResponse.GetResponseHeader("Content-disposition"), ".*filename=\"", "").Trim(new Char[] { '"' });
                     suffixName = System.IO.Path.GetExtension(_filename).ToLower();
 
-                    LogHelper.Save("接收信息：" + "StatusCode=" + myResponse.StatusCode.ToString() + "，StatusDescription=" + myResponse.StatusDescription + "，ContentType=" + myResponse.ContentType + "，Content-disposition=" + myResponse.GetResponseHeader("Content-disposition") + "，filename=" + _filename + "，suffixName=" + suffixName, nameof(Multimedia), LogType.Common, LogTime.day);
-                    //接收信息：StatusCode=OK，StatusDescription=OK，ContentType=，Content-disposition=attachment; filename="8a125212e0a52c0c59d6cabcd2de18e8.jpg"，filename=8a125212e0a52c0c59d6cabcd2de18e8.jpg，suffixName=.jpg
+                    //LogHelper.Save("接收信息：" + "StatusCode=" + myResponse.StatusCode.ToString() + "，StatusDescription=" + myResponse.StatusDescription + "，ContentType=" + myResponse.ContentType + "，Content-disposition=" + myResponse.GetResponseHeader("Content-disposition") + "，filename=" + _filename + "，suffixName=" + suffixName, nameof(Multimedia), LogType.Common, LogTime.day);
+                    //接收信息：StatusCode=OK，StatusDescription=OK，ContentType=image/jpeg，Content-disposition=attachment; filename="-zu3wS2bJFqRKMonF0CrbEBvnCtKCS7NPyHAvdUIh1rowBDclir9sPP5s1QSBHGT.jpg"，filename=-zu3wS2bJFqRKMonF0CrbEBvnCtKCS7NPyHAvdUIh1rowBDclir9sPP5s1QSBHGT.jpg，suffixName=.jpg
 
                     if(string.IsNullOrWhiteSpace(suffixName) && !string.IsNullOrWhiteSpace(contentType))
                         suffixName = GetSuffixNameByContentType(contentType);
@@ -284,8 +311,6 @@ namespace WeChatHelper4Net
 
             string strpath = string.Empty;
             string stUrl = Common.ApiUrl + string.Format("media/get/jssdk?access_token={0}&media_id={1}", ACCESS_TOKEN, MEDIA_ID);
-            var jsonString = "";
-            byte[] bytes = Encoding.UTF8.GetBytes(jsonString);
 
             string suffixName = string.Empty;
 
@@ -293,8 +318,6 @@ namespace WeChatHelper4Net
             req.Method = "GET";
             req.Timeout = 30000;
             req.KeepAlive = true;
-            req.ContentLength = bytes.Length;
-            req.GetRequestStream().Write(bytes, 0, bytes.Length);
 
             try
             {
