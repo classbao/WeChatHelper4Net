@@ -97,6 +97,7 @@
     <Content Include="Content\jweixinHelper-1.4.0.js" />
     <Content Include="Content\jweixinHelper.js" />
     <Content Include="Global.asax" />
+    <Content Include="Models\t_wechattokenorticket.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
