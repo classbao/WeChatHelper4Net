@@ -9,10 +9,10 @@ namespace SampleWebApp.Controllers
     public class HomeController : Controller
     {
         // GET: Home
-        public ActionResult Index()
-        {
-            return View();
-        }
+        //public ActionResult Index()
+        //{
+        //    return View();
+        //}
 
         /// <summary>
         /// 允许微信分享的页面

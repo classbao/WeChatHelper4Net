@@ -22,8 +22,7 @@ namespace SampleWebApp.Models
         {
             AccessToken.GetAccessTokenFromStorage get = delegate (DateTime Now, string AppId)
             {
-                //根据AppId从自定义存储库(接入者的DB、Cache、仓储源)获取AccessToken
-                /*
+                /* 根据AppId从自定义存储库(接入者的DB、Cache、仓储源)获取AccessToken
                  * return GetAccessTokenByCache(AppId);
                  * return GetAccessTokenByRedis(AppId);
                  * return GetAccessTokenByMemcache(AppId);
@@ -32,42 +31,72 @@ namespace SampleWebApp.Models
                  * ……
                  */
 
+                /***** 示例·开始 *****/
                 AccessTokenCacheModel AccessToken = null;
-                // 先从自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）
-                AccessToken = Data.GetAccessTokenByRedis(AppId);
+                /* 先从自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）*/
+                object TokenFromCache = CacheHelper.GetCache("WeChatAccessToken_" + AppId);
+                AccessToken = null != TokenFromCache ? (AccessTokenCacheModel)TokenFromCache : null;
                 if(WeChatHelper4Net.AccessToken.CheckAccessToken(Now, AccessToken))
                 {
                     return AccessToken;
                 }
-                // 如果快速数据没有，再从自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）
-                AccessToken = Data.GetAccessTokenByDB(AppId);
-                if(WeChatHelper4Net.AccessToken.CheckAccessToken(Now, AccessToken))
-                {
-                    return AccessToken;
-                }
+                /* 如果快速数据没有，再从自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）*/
+                //var TokenFromDB = BLLRepository.wechatManageBLL.GetTokenOrTicket(AppId, "AccessToken");
+                //if(null != TokenFromDB)
+                //{
+                //    AccessToken = new AccessTokenCacheModel()
+                //    {
+                //        appid = TokenFromDB.appid,
+                //        access_token = TokenFromDB.access_token,
+                //        expires_in = TokenFromDB.expires_in,
+                //        expires_time = TokenFromDB.expires_time,
+                //        errcode = TokenFromDB.errcode,
+                //        errmsg = TokenFromDB.errmsg
+                //    };
+                //    if(WeChatHelper4Net.AccessToken.CheckAccessToken(Now, AccessToken))
+                //    {
+                //        CacheHelper.SetCache("WeChatAccessToken_" + AccessToken.appid, AccessToken, AccessToken.expires_in / 60);
+                //        return AccessToken;
+                //    }
+                //}
+                /***** 示例·结束 *****/
 
                 return null;
             };
             AccessToken.UpdateAccessTokenToStorage update = delegate (DateTime now, AccessTokenCacheModel Token)
             {
-                //根据Token.appid将AccessToken插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
-                /*
-                 * return UpdateAccessTokenToCache(Token.appid, Token);
-                 * return UpdateAccessTokenToRedis(Token.appid, Token);
-                 * return UpdateAccessTokenToMemcache(Token.appid, Token);
-                 * return UpdateAccessTokenToMongodb(Token.appid, Token);
-                 * return UpdateAccessTokenToDB(Token.appid, Token);
+                bool result = false;
+
+                /* 根据Token.appid将AccessToken插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
+                 * result = UpdateAccessTokenToCache(Token.appid, Token);
+                 * result = UpdateAccessTokenToRedis(Token.appid, Token);
+                 * result = UpdateAccessTokenToMemcache(Token.appid, Token);
+                 * result = UpdateAccessTokenToMongodb(Token.appid, Token);
+                 * result = UpdateAccessTokenToDB(Token.appid, Token);
                  * ……
                  */
 
-                bool result = false;
+                /***** 示例·开始 *****/
                 if(null != Token && !string.IsNullOrWhiteSpace(Token.appid) && Token.expires_in > 60)
                 {
-                    // 先将票据存到自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）
-                    result = Data.UpdateAccessTokenToRedis(Token.appid, Token);
-                    // 为了避免快速数据丢失，再将票据存到自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）
-                    result = Data.UpdateAccessTokenToDB(Token.appid, Token);
+                    /* 先将票据存到自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）*/
+                    CacheHelper.SetCache("WeChatAccessToken_" + Token.appid, Token, Token.expires_in / 60);
+
+                    //var entity = new TbWeChatTokenOrTicketModel()
+                    //{
+                    //    appid = Token.appid,
+                    //    access_token = Token.access_token,
+                    //    expires_in = Token.expires_in,
+                    //    expires_time = Token.expires_time,
+                    //    errcode = Token.errcode,
+                    //    errmsg = Token.errmsg,
+                    //    type = "AccessToken",
+                    //    UpdateTime = DateTime.Now
+                    //};
+                    ///* 为了避免快速数据丢失，再将票据存到自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）*/
+                    //result = BLLRepository.wechatManageBLL.UpdateTokenOrTicket(entity);
                 }
+                /***** 示例·结束 *****/
 
                 return result;
             };
@@ -105,28 +134,75 @@ namespace SampleWebApp.Models
                     * ……
                     */
 
-                // 请自行实现（类似GetAccessToken()逻辑）
+                /***** 示例·开始 *****/
+                JSApiTicketCacheModel Ticket = null;
+                /* 先从自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）*/
+                object TokenFromCache = CacheHelper.GetCache("WeChatJSApiTicket_" + AppId);
+                Ticket = null != TokenFromCache ? (JSApiTicketCacheModel)TokenFromCache : null;
+                if(WeChatHelper4Net.JSSDK.CheckTicket(Now, Ticket))
+                {
+                    return Ticket;
+                }
+                /* 如果快速数据没有，再从自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）*/
+                //var TokenFromDB = BLLRepository.wechatManageBLL.GetTokenOrTicket(AppId, "JSApiTicket");
+                //if(null != TokenFromDB)
+                //{
+                //    Ticket = new JSApiTicketCacheModel()
+                //    {
+                //        appid = TokenFromDB.appid,
+                //        ticket = TokenFromDB.access_token,
+                //        expires_in = TokenFromDB.expires_in,
+                //        expires_time = TokenFromDB.expires_time,
+                //        errcode = TokenFromDB.errcode,
+                //        errmsg = TokenFromDB.errmsg
+                //    };
+                //    if(WeChatHelper4Net.JSSDK.CheckTicket(Now, Ticket))
+                //    {
+                //        CacheHelper.SetCache("WeChatJSApiTicket_" + Ticket.appid, Ticket, Ticket.expires_in / 60);
+                //        return Ticket;
+                //    }
+                //}
+                /***** 示例·结束 *****/
 
                 return null;
             };
             JSSDK.UpdateJSApiTicketToStorage update = delegate (DateTime now, JSApiTicketCacheModel Ticket)
             {
+                bool result = false;
+
                 //根据Ticket.appid将JSApiTicket插入或更新到自定义存储库(接入者的DB、Cache、仓储源)
                 /*
-                    * return UpdateJSApiTicketToCache(Ticket.appid, Ticket);
-                    * return UpdateJSApiTicketToRedis(Ticket.appid, Ticket);
-                    * return UpdateJSApiTicketToMemcache(Ticket.appid, Ticket);
-                    * return UpdateJSApiTicketToMongodb(Ticket.appid, Ticket);
-                    * return UpdateJSApiTicketToDB(Ticket.appid, Ticket);
+                    * result = UpdateJSApiTicketToCache(Ticket.appid, Ticket);
+                    * result = UpdateJSApiTicketToRedis(Ticket.appid, Ticket);
+                    * result = UpdateJSApiTicketToMemcache(Ticket.appid, Ticket);
+                    * result = UpdateJSApiTicketToMongodb(Ticket.appid, Ticket);
+                    * result = UpdateJSApiTicketToDB(Ticket.appid, Ticket);
                     * ……
                     */
 
+                /***** 示例·开始 *****/
                 if(null != Ticket && !string.IsNullOrWhiteSpace(Ticket.appid) && Ticket.expires_in > 60)
                 {
-                    // 请自行实现（类似GetAccessToken()逻辑）
-                }
+                    /* 先将票据存到自己系统的快速获取已存在的票据（Cache、Redis，Memcache等）*/
+                    CacheHelper.SetCache("WeChatJSApiTicket_" + Ticket.appid, Ticket, Ticket.expires_in / 60);
 
-                return true;
+                    //var entity = new TbWeChatTokenOrTicketModel()
+                    //{
+                    //    appid = Ticket.appid,
+                    //    access_token = Ticket.ticket,
+                    //    expires_in = Ticket.expires_in,
+                    //    expires_time = Ticket.expires_time,
+                    //    errcode = Ticket.errcode,
+                    //    errmsg = Ticket.errmsg,
+                    //    type = "JSApiTicket",
+                    //    UpdateTime = DateTime.Now
+                    //};
+                    /* 为了避免快速数据丢失，再将票据存到自己系统的稳定数据库获取已存在的票据（MySQL，SQLServer，Oracle等）*/
+                    //result = BLLRepository.wechatManageBLL.UpdateTokenOrTicket(entity);
+                }
+                /***** 示例·结束 *****/
+
+                return result;
             };
 
 

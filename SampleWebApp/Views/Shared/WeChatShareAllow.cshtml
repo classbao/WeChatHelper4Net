@@ -1,58 +1,60 @@
-﻿@model WeChatHelper4Net.Models.JSSDK.WeiXinShareData
-
+﻿<!-- 在允许微信分享的页面头部加入该部分视图(将不隐藏分享按钮) -->
+@model WeChatHelper4Net.Models.JSSDK.WeiXinShareData
 @{
     //微信JS-SDK授权配置
-    var jsConfig = SampleWebApp.Models.TokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
- }
-
-<!--微信窗口设置开始-->
-<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    var jsConfig = SampleWebApp.Models.WeChatTokenOrTicket.GetJSConfig(Request.Url.AbsoluteUri);
+}
+<!--微信窗口设置·开始-->
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script type="text/javascript">
-	wx.config({
-		//debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-		appId: "@jsConfig.appId",
-		timestamp: parseInt("@jsConfig.timestamp"),
-		nonceStr: "@jsConfig.nonceStr",
-		signature: "@jsConfig.signature",
-		jsApiList: [
-		  // 所有要调用的 API 都要加到这个列表中
-            'onMenuShareTimeline',
-            'onMenuShareAppMessage',
-            //'onMenuShareQQ',
-            //'onMenuShareWeibo',
-            //'onMenuShareQZone',
-            'startRecord',
-            'stopRecord',
-            'onVoiceRecordEnd',
-            'playVoice',
-            'pauseVoice',
-            'stopVoice',
-            'onVoicePlayEnd',
-            'uploadVoice',
-            'downloadVoice',
-            'chooseImage',
-            'previewImage',
-            'uploadImage',
-            'downloadImage',
-            'translateVoice',
-            'getNetworkType',
-            'openLocation',
-            'getLocation',
-            'hideOptionMenu',
-            'showOptionMenu',
-            'hideMenuItems',
-            'showMenuItems',
-            'hideAllNonBaseMenuItem',
-            'showAllNonBaseMenuItem',
-            'closeWindow',
-            'scanQRCode',
-            'chooseWXPay',
-            'openProductSpecificView',
-            'addCard',
-            'chooseCard',
-            'openCard'
-		]
-	});
+    function wxConfig() {
+        wx.config({
+            //debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: "@jsConfig.appId",
+            timestamp: parseInt("@jsConfig.timestamp"),
+            nonceStr: "@jsConfig.nonceStr",
+            signature: "@jsConfig.signature",
+            jsApiList: [
+              // 所有要调用的 API 都要加到这个列表中
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage',
+                'onMenuShareQQ',
+                'onMenuShareWeibo',
+                'onMenuShareQZone',
+                'startRecord',
+                'stopRecord',
+                'onVoiceRecordEnd',
+                'playVoice',
+                'pauseVoice',
+                'stopVoice',
+                'onVoicePlayEnd',
+                'uploadVoice',
+                'downloadVoice',
+                'chooseImage',
+                'previewImage',
+                'uploadImage',
+                'downloadImage',
+                'translateVoice',
+                'getNetworkType',
+                'openLocation',
+                'getLocation',
+                'hideOptionMenu',
+                'showOptionMenu',
+                'hideMenuItems',
+                'showMenuItems',
+                'hideAllNonBaseMenuItem',
+                'showAllNonBaseMenuItem',
+                'closeWindow',
+                'scanQRCode',
+                'chooseWXPay',
+                'openProductSpecificView',
+                'addCard',
+                'chooseCard',
+                'openCard'
+            ]
+        });
+    };
+
 	//微信分享信息设置
 	var shareData = {
 		title: "@(Model.title)", // 分享标题
@@ -76,7 +78,7 @@
 
 		        //特殊对待
 		    	if ("@Model.link.Contains("TeacherActivityResult2015")".toLowerCase() == "true") {
-		    		$("#returnButton").text("已寄出，去首页");
+		    		$("#returnButton").text("已寄出，去壹学者");
 		    	};
 
 		    }
@@ -98,13 +100,13 @@
 	};
 
 	//初始化选项
-	$(document).ready(function () {
-
+    $(function () {
+	    wxConfig();
 	});
 </script>
-<script type="text/javascript" src="@Url.Content("~/Content/js/jweixinHelper.js")"></script>
-<!--微信窗口设置结束-->
-<!--记录微信分享开始-->
+<script type="text/javascript" src="@Url.Content("~/Content/jweixinHelper-1.4.0.js")"></script>
+<!--微信窗口设置·结束-->
+<!--记录微信分享·开始-->
 <script type="text/javascript">
     function share(openid, metaid, metatype, title, shareUrl) {
 		//alert("openid=" + openid + "，" + metaid + "，" + metatype + "，\n\rshareUrl=" + shareUrl);
@@ -152,4 +154,4 @@
 		}
 	}
 </script>
-<!--记录微信分享结束-->
+<!--记录微信分享·结束-->

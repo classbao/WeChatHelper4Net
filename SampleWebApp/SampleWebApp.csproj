@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\CustomData.xml" />
+    <Content Include="Content\jweixinHelper-1.4.0.js" />
     <Content Include="Content\jweixinHelper.js" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
@@ -108,8 +109,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\TWeChatTokenOrTicketModel.cs" />
     <Compile Include="Models\WeChatCustomShareData.cs" />
-    <Compile Include="Models\Data.cs" />
     <Compile Include="Models\WeChatTokenOrTicket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -120,10 +121,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Properties\PublishProfiles\SampleWebAppRelease.pubxml" />
-    <Content Include="Views\Shared\WeChatShare.cshtml" />
-    <Content Include="Views\Shared\NotWeChatShare.cshtml" />
     <Content Include="Views\Home\AllowWeChatToShare.cshtml" />
     <Content Include="Views\Home\NotAllowWeChatToShare.cshtml" />
+    <Content Include="Views\Shared\WeChatShareAllow.cshtml" />
+    <Content Include="Views\Shared\WeChatShareNotAllow.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -149,7 +150,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>33394</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
