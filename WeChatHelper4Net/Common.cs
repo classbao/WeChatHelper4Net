@@ -55,6 +55,55 @@ namespace WeChatHelper4Net
         /// 商户号（MCHID）
         /// </summary>
         public static string PartnerID { get { return Privacy.PartnerID; } }
+
+        /// <summary>
+        /// 从微信官方获取微信公众号名片，简单快速获取微信公众号原始二维码（当用户未关注时打开关注页面）
+        /// 返回：微信号二维码链接
+        /// </summary>
+        /// <param name="username">1，可以是微信公众号的微信号；2，可以是微信公众号的原始ID</param>
+        /// <returns>二维码链接</returns>
+        public static string GetQrCode(string username = "")
+        {
+            if(string.IsNullOrWhiteSpace(username))
+            {
+                if(!string.IsNullOrWhiteSpace(WeChatNumber))
+                    username = WeChatNumber;
+                else if(!string.IsNullOrWhiteSpace(WeChatId))
+                    username = WeChatId;
+                else
+                {
+                }
+            }
+
+            // https://open.weixin.qq.com/qr/code?username=gh_98cd54386ce7
+            return string.Format("https://open.weixin.qq.com/qr/code?username={0}", username);
+        }
+        /// <summary>
+        /// 公众号原始页、公众号主页、一键关注页面
+        /// 返回：微信公众号链接
+        /// </summary>
+        /// <param name="biz">biz，appuin，如何获取？打开你公众号内任意一篇文章(公众号详细页即可)，复制链接到txt中，文章链接中的“__biz=”后面的参数值既是。</param>
+        /// <param name="action">页面</param>
+        /// <param name="scene">场景</param>
+        /// <returns>微信公众号链接</returns>
+        public static string GetProfileUrl(string biz, string action = "", int scene = 0)
+        {
+            // https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzU1OTgxMDQyMw==&scene=110#wechat_redirect
+            StringBuilder sb = new StringBuilder("https://mp.weixin.qq.com/mp/profile_ext?");
+            sb.AppendFormat("action={0}", string.IsNullOrWhiteSpace(action) ? "home" : action);
+            sb.AppendFormat("&__biz={0}", biz);
+            if(scene > 0)
+            {
+                sb.AppendFormat("&scene={0}", scene);
+            }
+            sb.Append("#wechat_redirect");
+            return sb.ToString();
+            /*
+             * 参考：https://www.cnblogs.com/HaiHong/p/7531858.html
+             * 参考：http://post.mp.qq.com/group/show/31393039373035323534-13485709.html?_wv=2281701505&v=3&sig=00fd7ddf1408f42b202bcaa3b211c895&_bid=2321&article_id=13485709&time=1476102000&web_ch_id=0
+             * 参考：http://www.sohu.com/a/106819570_358664
+             */
+        }
         #endregion
 
         #region ApiUrl
