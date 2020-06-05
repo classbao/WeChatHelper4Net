@@ -67,6 +67,8 @@
     <Compile Include="LogHelper.cs" />
     <Compile Include="Map\BaiduMap.cs" />
     <Compile Include="Map\BaiduMapModel.cs" />
+    <Compile Include="Map\BaiduWeather.cs" />
+    <Compile Include="Map\BaiduWeatherModel.cs" />
     <Compile Include="Map\LatLonUtil.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Models\AccessTokenModel.cs" />

@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("WeChatHelper4Net")]
-[assembly: AssemblyDescription("WeChatHelper4Net Of ClassBao")]
+[assembly: AssemblyDescription("WeChatHelper4Net Of ClassBao-北京浩赢科技出品")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ClassBao")]
+[assembly: AssemblyCompany("ClassBao-北京浩赢科技")]
 [assembly: AssemblyProduct("WeChatHelper4Net")]
 [assembly: AssemblyCopyright("Copyright © ClassBao 2017")]
-[assembly: AssemblyTrademark("ClassBao")]
+[assembly: AssemblyTrademark("ClassBao-北京浩赢科技")]
 [assembly: AssemblyCulture("")]
 
 //将 ComVisible 设置为 false 将使此程序集中的类型

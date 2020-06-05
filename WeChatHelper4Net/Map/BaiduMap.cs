@@ -7,7 +7,7 @@ using System.Text;
 using System.Web;
 
 /*
- * 地图服务
+ * 百度地图服务
  * 作者：熊学浩
  * 时间：2014-5-25
  */
@@ -93,7 +93,7 @@ namespace WeChatHelper4Net.Map
 		/// </summary>
 		/// <param name="url"></param>
 		/// <returns></returns>
-		private static string HttpGet(string url)
+		public static string HttpGet(string url)
 		{
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(url));
 			request.Method = "GET";
