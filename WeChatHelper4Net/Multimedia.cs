@@ -23,7 +23,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 下载保存多媒体文件,返回多媒体保存路径
         /// </summary>
-        /// <param name="ACCESS_TOKEN">ACCESS_TOKEN</param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID">MEDIA_ID</param>
         /// <param name="physicalFolder">物理文件夹</param>
         /// <param name="fileName">保存文件名(不需要后缀名)</param>
@@ -111,7 +111,7 @@ namespace WeChatHelper4Net
         /// <param name="physicalFolder">保存目标物理文件夹路径。例如：D:\\UploadFiles\\</param>
         /// <param name="fileName">保存文件名(不需要后缀名)</param>
         /// <param name="fileSize">文件大小</param>
-        /// <param name="access_token">access_token</param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns>多媒体保存路径（多个ID用英文半角逗号分隔）</returns>
         [Obsolete("由于微信接口变更，该方法已过时")]
         public static string DownloadMultimedia(string MEDIA_ID, string physicalFolder, ref string fileName, out long fileSize, string access_token)
@@ -184,7 +184,7 @@ namespace WeChatHelper4Net
         /// 获取临时素材(除了图文，视频，语音)
         /// 公众号可以使用本接口获取临时素材（即下载临时的多媒体文件）。请注意，视频文件不支持https下载，调用该接口需http协议。本接口即为原“下载多媒体文件”接口。
         /// </summary>
-        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID"></param>
         /// <param name="fileName"></param>
         /// <param name="fileSize"></param>
@@ -269,7 +269,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 获取永久素材(临时)
         /// </summary>
-        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID"></param>
         /// <returns></returns>
         public static TempVideo GetTempVideo(string ACCESS_TOKEN, string MEDIA_ID)
@@ -297,7 +297,7 @@ namespace WeChatHelper4Net
         /// 高清语音素材获取接口(临时)
         /// 公众号可以使用本接口获取从JSSDK的uploadVoice接口上传的临时语音素材，格式为speex，16K采样率。该音频比上文的临时素材获取接口（格式为amr，8K采样率）更加清晰，适合用作语音识别等对音质要求较高的业务。
         /// </summary>
-        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID"></param>
         /// <param name="fileName"></param>
         /// <param name="fileSize"></param>
@@ -403,7 +403,7 @@ namespace WeChatHelper4Net
         /// 视频（video）：10MB，支持MP4格式
         /// 缩略图（thumb）：64KB，支持JPG格式
         /// </summary>
-        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID"></param>
         /// <param name="fileName"></param>
         /// <param name="fileSize"></param>
@@ -493,7 +493,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 获取永久素材(视频)
         /// </summary>
-        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID"></param>
         /// <returns></returns>
         public static ForeverVideo GetForeverVideo(string ACCESS_TOKEN, string MEDIA_ID)
@@ -524,7 +524,7 @@ namespace WeChatHelper4Net
         /// 获取永久素材(图文)
         /// 待完成
         /// </summary>
-        /// <param name="ACCESS_TOKEN"></param>
+        /// <param name="ACCESS_TOKEN">访问令牌</param>
         /// <param name="MEDIA_ID"></param>
         public static void GetForeverNews(string ACCESS_TOKEN, string MEDIA_ID)
         {

@@ -12,6 +12,9 @@ namespace WeChatHelper4Net.Models.CustomService.Base
     [DataContract]
     public class Text
     {
+        /// <summary>
+        /// 文本内容
+        /// </summary>
         [DataMember(IsRequired = true)]
         public string content { get; set; }
     }
@@ -20,6 +23,9 @@ namespace WeChatHelper4Net.Models.CustomService.Base
     [DataContract]
     public class MediaId
     {
+        /// <summary>
+        /// 媒体ID
+        /// </summary>
         [DataMember(IsRequired = true)]
         public string media_id { get; set; }
     }
@@ -28,9 +34,14 @@ namespace WeChatHelper4Net.Models.CustomService.Base
     [DataContract]
     public class Title
     {
+        /// <summary>
+        /// 标题
+        /// </summary>
         [DataMember(IsRequired = true)]
         public string title { get; set; }
-
+        /// <summary>
+        /// 描述
+        /// </summary>
         [DataMember(IsRequired = true)]
         public string description { get; set; }
     }
@@ -39,6 +50,9 @@ namespace WeChatHelper4Net.Models.CustomService.Base
     [DataContract]
     public class CardId
     {
+        /// <summary>
+        /// 卡ID
+        /// </summary>
         [DataMember(IsRequired = true)]
         public string card_id { get; set; }
     }
@@ -49,6 +63,9 @@ namespace WeChatHelper4Net.Models.CustomService.Base
     [DataContract]
     public class kfAccount
     {
+        /// <summary>
+        /// 客服账号
+        /// </summary>
         [DataMember(IsRequired = true)]
         public string kf_account { get; set; }
     }

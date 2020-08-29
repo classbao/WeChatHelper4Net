@@ -126,7 +126,7 @@ namespace WeChatHelper4Net.OpenWeb
 		/// <summary>
 		/// 检验授权凭证（access_token）是否有效
 		/// </summary>
-		/// <param name="access_token"></param>
+		/// <param name="access_token">访问令牌</param>
 		/// <param name="openid"></param>
 		/// <returns></returns>
 		public static Boolean CheckToken(string access_token, string openid)
@@ -159,7 +159,7 @@ namespace WeChatHelper4Net.OpenWeb
 		/// <summary>
 		/// 获取用户基本信息，返回JSON数据包
 		/// </summary>
-		/// <param name="access_token"></param>
+		/// <param name="access_token">访问令牌</param>
 		/// <param name="openid">普通用户的标识，对当前公众号唯一</param>
 		/// <returns>UserModel</returns>
 		public static UserModel GetUserInfo(string access_token, string openid)

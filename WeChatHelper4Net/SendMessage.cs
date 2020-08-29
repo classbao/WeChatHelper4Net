@@ -24,7 +24,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 发送客服消息接口，http请求方式: POST
         /// </summary>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         private static string urlToUser(string access_token)
         {
@@ -194,7 +194,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 根据分组进行群发接口，http请求方式: POST
         /// </summary>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         private static string urlToGroup(string access_token)
         {
@@ -319,7 +319,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 根据OpenID列表群发消息接口，http请求方式: POST
         /// </summary>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         private static string urlToUserList(string access_token)
         {
@@ -449,7 +449,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 发送模版消息接口，http请求方式: POST
         /// </summary>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         private static string urlToTemplateMessage(string access_token)
         {
@@ -460,7 +460,7 @@ namespace WeChatHelper4Net
         /// 模版消息【待办工作提醒】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.WorkRemind msg, string access_token)
         {
@@ -505,7 +505,7 @@ namespace WeChatHelper4Net
         /// 模版消息【订单支付成功通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.PaymentSuccess msg, string access_token)
         {
@@ -553,7 +553,7 @@ namespace WeChatHelper4Net
         /// 模版消息【客户留言通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.CustomerMessageNotice msg, string access_token)
         {
@@ -599,7 +599,7 @@ namespace WeChatHelper4Net
         /// 模版消息【论文收录结果通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.PapersIncludedNotice msg, string access_token)
         {
@@ -646,7 +646,7 @@ namespace WeChatHelper4Net
         /// 模版消息【会议提醒】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.MeetingReminder msg, string access_token)
         {
@@ -693,7 +693,7 @@ namespace WeChatHelper4Net
         /// 模版消息【会议提醒】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.Track msg, string access_token)
         {
@@ -739,7 +739,7 @@ namespace WeChatHelper4Net
         /// 模版消息【最新学术活动通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.DynamicNotice msg, string access_token)
         {
@@ -788,7 +788,7 @@ namespace WeChatHelper4Net
         /// 模版消息【活动报名成功通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.ActivitiesJoinNotice msg, string access_token)
         {
@@ -836,7 +836,7 @@ namespace WeChatHelper4Net
         /// 模版消息【最新学术交流意见反馈通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.ExchangeFeedbackNotice msg, string access_token)
         {
@@ -884,7 +884,7 @@ namespace WeChatHelper4Net
         /// 模版消息【教授名单更新通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.ProfessorUpdateNotice msg, string access_token)
         {
@@ -931,7 +931,7 @@ namespace WeChatHelper4Net
         /// 模版消息【新活动参与者提醒】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.ActivityParticipantsReminder msg, string access_token)
         {
@@ -978,7 +978,7 @@ namespace WeChatHelper4Net
         /// 模版消息【待处理事项通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.WorkNotice msg, string access_token)
         {
@@ -1025,7 +1025,7 @@ namespace WeChatHelper4Net
         /// 模版消息【开奖结果通知】
         /// </summary>
         /// <param name="msg"></param>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static RequestResultBaseModel Template(Models.TemplateMessage.LotteryResultsNotice msg, string access_token)
         {

@@ -84,7 +84,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 获取自定义菜单配置
         /// </summary>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns></returns>
         public static string GetCurrentSelfMenu(string access_token)
         {

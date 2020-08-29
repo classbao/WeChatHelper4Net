@@ -112,7 +112,7 @@ namespace WeChatHelper4Net
         /// </summary>
         /// <param name="Now">当前日期时间</param>
         /// <param name="AppId">AppId为空时默认取配置文件appSettings节点key=WeChatAppId</param>
-        /// <param name="access_token">access_token</param>
+        /// <param name="access_token">访问令牌</param>
         /// <param name="GetJSApiTicketFromStorage">委托客户端从自定义存储库(接入者的DB、Cache、仓储源)获取JSApiTicket</param>
         /// <param name="UpdateJSApiTicketToStorage">委托客户端将JSApiTicket插入或更新到自定义存储库(接入者的DB、Cache、仓储源)</param>
         /// <returns></returns>

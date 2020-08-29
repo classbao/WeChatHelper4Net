@@ -9,6 +9,9 @@ using System.Runtime.Serialization;
  */
 namespace WeChatHelper4Net.Models.CustomService
 {
+    /// <summary>
+    /// 文本消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class TextMsg : Base.Base
@@ -19,7 +22,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public Base.Text text { get; set; }
     }
 
-
+    /// <summary>
+    /// 图片消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class ImageMsg : Base.Base
@@ -30,6 +35,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public Base.MediaId image { get; set; }
     }
 
+    /// <summary>
+    /// 语音消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class VoiceMsg : Base.Base
@@ -40,7 +48,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public Base.MediaId voice { get; set; }
     }
 
-
+    /// <summary>
+    /// 视频消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class Video : Base.Title
@@ -52,6 +62,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public string thumb_media_id { get; set; }
     }
 
+    /// <summary>
+    /// 视频消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class VideoMsg : Base.Base
@@ -62,6 +75,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public Video video { get; set; }
     }
 
+    /// <summary>
+    /// 音乐消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class Music : Base.Title
@@ -76,7 +92,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public string thumb_media_id { get; set; }
     }
 
-
+    /// <summary>
+    /// 音乐消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class MusicMsg : Base.Base
@@ -87,6 +105,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public Music music { get; set; }
     }
 
+    /// <summary>
+    /// 图文(单)消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class Article : Base.Title
@@ -97,7 +118,10 @@ namespace WeChatHelper4Net.Models.CustomService
         [DataMember(IsRequired = true)]
         public string picurl { get; set; }
     }
-    
+
+    /// <summary>
+    /// 图文(列表)消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class News
@@ -106,6 +130,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public List<Article> articles { get; set; }
     }
 
+    /// <summary>
+    /// 图文(列表)消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class NewsMsg : Base.Base
@@ -116,6 +143,9 @@ namespace WeChatHelper4Net.Models.CustomService
         public News news { get; set; }
     }
 
+    /// <summary>
+    /// /// 图文消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class mpNewsMsg : Base.Base
@@ -125,7 +155,10 @@ namespace WeChatHelper4Net.Models.CustomService
         [DataMember(IsRequired = true)]
         public Base.MediaId mpnews { get; set; }
     }
-    
+
+    /// <summary>
+    /// 卡券消息模型
+    /// </summary>
     [Serializable]
     [DataContract]
     public class wxCardMsg : Base.Base

@@ -39,6 +39,12 @@ namespace WeChatHelper4Net.CustomService
 
 
         #region 发送文本消息
+        /// <summary>
+        /// 发送文本消息
+        /// </summary>
+        /// <param name="msg">消息</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendText(TextMsg msg, string access_token)
         {
             if(null == msg)
@@ -51,6 +57,13 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送文本消息
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="content"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendText(string openId, string content, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -62,6 +75,12 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("Hello World", content);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送文本消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendTextByKF(kfTextMsg msg, string access_token)
         {
             if(null == msg)
@@ -76,6 +95,14 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送文本消息(客服)
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="content"></param>
+        /// <param name="kfAccount">客服账号示例: test1@test</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendTextByKF(string openId, string content, string kfAccount, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -92,6 +119,12 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送图片消息
+        /// <summary>
+        /// 发送图片消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendImage(ImageMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -102,6 +135,13 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送图片消息
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="mediaId"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendImage(string openId, string mediaId, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -113,6 +153,12 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID", mediaId);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送图片消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendImageByKF(kfImageMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -125,6 +171,14 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送图片消息(客服)
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="mediaId"></param>
+        /// <param name="kfAccount">客服账号示例: test1@test</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendImageByKF(string openId, string mediaId, string kfAccount, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -141,6 +195,12 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送语音消息
+        /// <summary>
+        /// 发送语音消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVoice(VoiceMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -151,6 +211,13 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送语音消息
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="mediaId"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVoice(string openId, string mediaId, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -162,6 +229,12 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID", mediaId);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送语音消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVoiceByKF(kfVoiceMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -174,6 +247,14 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送语音消息(客服)
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="mediaId"></param>
+        /// <param name="kfAccount">客服账号示例: test1@test</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVoiceByKF(string openId, string mediaId, string kfAccount, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -190,6 +271,12 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送视频消息
+        /// <summary>
+        /// 发送视频消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVideo(VideoMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -200,6 +287,16 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送视频消息
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="mediaId"></param>
+        /// <param name="thumb_media_id"></param>
+        /// <param name="title"></param>
+        /// <param name="description"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVideo(string openId, string mediaId, string thumb_media_id, string title, string description, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -213,6 +310,12 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID1", mediaId).Replace("MEDIA_ID2", thumb_media_id).Replace("TITLE", title).Replace("DESCRIPTION", description);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送视频消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVideoByKF(kfVideoMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -225,6 +328,17 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送视频消息(客服)
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="mediaId"></param>
+        /// <param name="thumb_media_id"></param>
+        /// <param name="title"></param>
+        /// <param name="description"></param>
+        /// <param name="kfAccount">客服账号示例: test1@test</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendVideoByKF(string openId, string mediaId, string thumb_media_id, string title, string description, string kfAccount, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -243,6 +357,12 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送音乐消息
+        /// <summary>
+        /// 发送音乐消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendMusic(MusicMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -253,6 +373,17 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送音乐消息
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="title"></param>
+        /// <param name="description"></param>
+        /// <param name="musicurl"></param>
+        /// <param name="hqmusicurl"></param>
+        /// <param name="thumb_media_id"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendMusic(string openId, string title, string description, string musicurl, string hqmusicurl, string thumb_media_id, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -266,6 +397,12 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("MUSIC_TITLE", title).Replace("MUSIC_DESCRIPTION", description).Replace("HQ_MUSIC_URL", hqmusicurl).Replace("MUSIC_URL", musicurl).Replace("THUMB_MEDIA_ID", thumb_media_id);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送音乐消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendMusicByKF(kfMusicMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -278,6 +415,18 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送音乐消息(客服)
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="title"></param>
+        /// <param name="description"></param>
+        /// <param name="musicurl"></param>
+        /// <param name="hqmusicurl"></param>
+        /// <param name="thumb_media_id"></param>
+        /// <param name="kfAccount">客服账号示例: test1@test</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendMusicByKF(string openId, string title, string description, string musicurl, string hqmusicurl, string thumb_media_id, string kfAccount, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -296,6 +445,12 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送图文消息
+        /// <summary>
+        /// 发送图文消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendNews(NewsMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -306,7 +461,12 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
-
+        /// <summary>
+        /// 发送图文消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendNewsByKF(kfNewsMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -319,7 +479,12 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
-
+        /// <summary>
+        /// 发送图文消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendmpNews(mpNewsMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -330,7 +495,12 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
-
+        /// <summary>
+        /// 发送图文消息(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendmpNewsByKF(kfmpNewsMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -347,6 +517,12 @@ namespace WeChatHelper4Net.CustomService
         #endregion
 
         #region 发送卡券
+        /// <summary>
+        /// 发送卡券
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendwxCard(wxCardMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -357,6 +533,13 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送卡券
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="card_id"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendwxCard(string openId, string card_id, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))
@@ -368,6 +551,12 @@ namespace WeChatHelper4Net.CustomService
             jsonString = jsonString.Replace("OPENID", openId).Replace("CARD_ID", card_id);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送卡券(客服)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendwxCardByKF(kfwxCardMsg msg, string access_token)
         {
             if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
@@ -380,6 +569,14 @@ namespace WeChatHelper4Net.CustomService
             string jsonString = JsonHelper.Serialize(msg);
             return SendToWeCart(jsonString, access_token);
         }
+        /// <summary>
+        /// 发送卡券(客服)
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="card_id"></param>
+        /// <param name="kfAccount">客服账号示例: test1@test</param>
+        /// <param name="access_token">访问令牌</param>
+        /// <returns></returns>
         public static RequestResultBaseModel SendwxCardByKF(string openId, string card_id, string kfAccount, string access_token)
         {
             if(string.IsNullOrWhiteSpace(openId))

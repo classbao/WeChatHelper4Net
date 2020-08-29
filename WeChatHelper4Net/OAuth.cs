@@ -72,7 +72,7 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 检验授权凭证（access_token）是否有效
         /// </summary>
-        /// <param name="access_token"></param>
+        /// <param name="access_token">访问令牌</param>
         /// <param name="openid"></param>
         /// <returns></returns>
         public static bool CheckAccessToken(string access_token, string openid)

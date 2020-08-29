@@ -92,7 +92,7 @@ namespace WeChatHelper4Net
         /// </summary>
         /// <param name="expire_seconds">该二维码有效时间，以秒为单位。 最大不超过604800（即7天）。</param>
         /// <param name="scene_id">场景值ID，临时二维码时为32位非0整型</param>
-        /// <param name="access_token">access_token</param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns>正确情况下，http 返回码是200，是一张图片，可以直接展示或者下载</returns>
         public static string GetQrCode(int expire_seconds, int scene_id, string access_token)
 		{
@@ -105,7 +105,7 @@ namespace WeChatHelper4Net
         /// 生成带参数的二维码（永久二维码），本接口无须登录态即可调用。正确情况下，http 返回码是200，是一张图片，可以直接展示或者下载。
         /// </summary>
         /// <param name="scene_id">场景值ID，永久二维码时最大值为100000（目前参数只支持1--100000）</param>
-        /// <param name="access_token">access_token</param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns>正确情况下，http 返回码是200，是一张图片，可以直接展示或者下载</returns>
         public static string GetQrCode(int scene_id, string access_token)
 		{
@@ -118,7 +118,7 @@ namespace WeChatHelper4Net
         /// 生成带参数的二维码（永久二维码），本接口无须登录态即可调用。正确情况下，http 返回码是200，是一张图片，可以直接展示或者下载。
         /// </summary>
         /// <param name="scene_str">场景值ID（字符串形式的ID），字符串类型，长度限制为1到64，仅永久二维码支持此字段</param>
-        /// <param name="access_token">access_token</param>
+        /// <param name="access_token">访问令牌</param>
         /// <returns>正确情况下，http 返回码是200，是一张图片，可以直接展示或者下载</returns>
         public static string GetQrCode(string scene_str, string access_token)
 		{
