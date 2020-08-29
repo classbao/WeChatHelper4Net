@@ -31,5 +31,16 @@ namespace SampleWebApp.Controllers
             return View();
         }
 
+
+        public ActionResult TestMsg()
+        {
+            var msg = new WeChatHelper4Net.Models.CustomService.TextMsg() { };
+            var r = WeChatHelper4Net.CustomService.SendMsg.SendText(msg, "1231351531351351");
+
+            return View();
+        }
+
+
+
     }
 }
