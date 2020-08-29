@@ -21,32 +21,36 @@ namespace WeChatHelper4Net.CustomService
             return Common.ApiUrl + string.Format("message/custom/send?access_token={0}", access_token);
         }
 
-        
-
-        #region 发送文本消息
-        public static RequestResultBaseModel SendText(TextMsg msg, string access_token)
+        private static RequestResultBaseModel SendToWeCart(string jsonString, string access_token)
         {
-            if (null == msg)
-                throw new ArgumentException("参数错误", nameof(msg));
-            if (string.IsNullOrWhiteSpace(msg.touser))
-                throw new ArgumentException("参数错误", nameof(msg.touser));
-            if (null == msg.text || string.IsNullOrWhiteSpace(msg.text.content))
-                throw new ArgumentException("content参数错误");
-
-            string jsonString = JsonHelper.Serialize(msg);
             string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
-            if (Common.ReturnJSONisOK(result))
+            if(Common.ReturnJSONisOK(result))
                 return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
             else
             {
                 RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
-                if (entity != null)
+                if(entity != null)
                 {
                     entity.url = SendMsgApiUrl(access_token);
                     entity.date = jsonString;
                 }
                 return entity;
             }
+        }
+
+
+        #region 发送文本消息
+        public static RequestResultBaseModel SendText(TextMsg msg, string access_token)
+        {
+            if(null == msg)
+                throw new ArgumentException("参数错误", nameof(msg));
+            if(string.IsNullOrWhiteSpace(msg.touser))
+                throw new ArgumentException("参数错误", nameof(msg.touser));
+            if(null == msg.text || string.IsNullOrWhiteSpace(msg.text.content))
+                throw new ArgumentException("content参数错误");
+
+            string jsonString = JsonHelper.Serialize(msg);
+            return SendToWeCart(jsonString, access_token);
         }
         public static RequestResultBaseModel SendText(string openId, string content, string access_token)
         {
@@ -57,20 +61,7 @@ namespace WeChatHelper4Net.CustomService
 
             string jsonString = "{\"touser\":\"OPENID\",\"msgtype\":\"text\",\"text\":{\"content\":\"Hello World\"}}";
             jsonString = jsonString.Replace("OPENID", openId).Replace("Hello World", content);
-
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
-            if (Common.ReturnJSONisOK(result))
-                return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
-            else
-            {
-                RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
-                if (entity != null)
-                {
-                    entity.url = SendMsgApiUrl(access_token);
-                    entity.date = jsonString;
-                }
-                return entity;
-            }
+            return SendToWeCart(jsonString, access_token);
         }
         public static RequestResultBaseModel SendTextByKF(kfTextMsg msg, string access_token)
         {
@@ -84,19 +75,7 @@ namespace WeChatHelper4Net.CustomService
                 throw new ArgumentException("customservice参数不能为空");
 
             string jsonString = JsonHelper.Serialize(msg);
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
-            if (Common.ReturnJSONisOK(result))
-                return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
-            else
-            {
-                RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
-                if (entity != null)
-                {
-                    entity.url = SendMsgApiUrl(access_token);
-                    entity.date = jsonString;
-                }
-                return entity;
-            }
+            return SendToWeCart(jsonString, access_token);
         }
         public static RequestResultBaseModel SendTextByKF(string openId, string content, string kfAccount, string access_token)
         {
@@ -109,76 +88,56 @@ namespace WeChatHelper4Net.CustomService
 
             string jsonString = "{\"touser\":\"OPENID\",\"msgtype\":\"text\",\"text\":{\"content\":\"Hello World\"},\"customservice\":{\"kf_account\":\"test1@kftest\"}}";
             jsonString = jsonString.Replace("OPENID", openId).Replace("Hello World", content).Replace("test1@kftest", kfAccount);
-            string result = HttpRequestHelper.Request(SendMsgApiUrl(access_token), jsonString, HttpRequestHelper.Method.POST, System.Text.Encoding.UTF8);
-            if (Common.ReturnJSONisOK(result))
-                return new RequestResultBaseModel() { errcode = 0, errmsg = "ok" };
-            else
-            {
-                RequestResultBaseModel entity = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
-                if (entity != null)
-                {
-                    entity.url = SendMsgApiUrl(access_token);
-                    entity.date = jsonString;
-                }
-                return entity;
-            }
+            return SendToWeCart(jsonString, access_token);
         }
         #endregion
 
         #region 发送图片消息
-        public static string SendImage(ImageMsg msg)
+        public static RequestResultBaseModel SendImage(ImageMsg msg, string access_token)
         {
             if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
-                return string.Empty;
+                throw new ArgumentException("参数错误", nameof(msg.touser));
             if (null == msg.image || string.IsNullOrWhiteSpace(msg.image.media_id))
                 throw new ArgumentException("image错误");
 
             string jsonString = JsonHelper.Serialize(msg);
-            if (!string.IsNullOrWhiteSpace(jsonString))
-            {
-                return jsonString;
-            }
-            return string.Empty;
+            return SendToWeCart(jsonString, access_token);
         }
-        public static string SendImage(string openId, string mediaId)
+        public static RequestResultBaseModel SendImage(string openId, string mediaId, string access_token)
         {
             if (string.IsNullOrWhiteSpace(openId))
-                return string.Empty;
+                throw new ArgumentException("参数错误", nameof(openId));
             if (string.IsNullOrWhiteSpace(mediaId))
-                throw new ArgumentException("mediaId错误");
+                throw new ArgumentException("参数错误", nameof(mediaId));
 
             string jsonString = "{\"touser\":\"OPENID\",\"msgtype\":\"image\",\"image\":{\"media_id\":\"MEDIA_ID\"}}";
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID", mediaId);
-            return jsonString;
+            return SendToWeCart(jsonString, access_token);
         }
-        public static string SendImageByKF(kfImageMsg msg)
+        public static RequestResultBaseModel SendImageByKF(kfImageMsg msg, string access_token)
         {
-            if (null == msg || string.IsNullOrWhiteSpace(msg.touser))
-                return string.Empty;
-            if (null == msg.image || string.IsNullOrWhiteSpace(msg.image.media_id))
+            if(null == msg || string.IsNullOrWhiteSpace(msg.touser))
+                throw new ArgumentException("参数错误", nameof(msg.touser));
+            if(null == msg.image || string.IsNullOrWhiteSpace(msg.image.media_id))
                 throw new ArgumentException("image错误");
-            if (null == msg.customservice || string.IsNullOrWhiteSpace(msg.customservice.kf_account))
+            if(null == msg.customservice || string.IsNullOrWhiteSpace(msg.customservice.kf_account))
                 throw new ArgumentException("customservice参数不能为空");
 
             string jsonString = JsonHelper.Serialize(msg);
-            if (!string.IsNullOrWhiteSpace(jsonString))
-            {
-                return jsonString;
-            }
-            return string.Empty;
+            return SendToWeCart(jsonString, access_token);
         }
-        public static string SendImageByKF(string openId, string mediaId, string kfAccount)
+        public static RequestResultBaseModel SendImageByKF(string openId, string mediaId, string kfAccount, string access_token)
         {
-            if (string.IsNullOrWhiteSpace(openId))
-                return string.Empty;
-            if (string.IsNullOrWhiteSpace(mediaId))
+            if(string.IsNullOrWhiteSpace(openId))
+                throw new ArgumentException("参数错误", nameof(openId));
+            if(string.IsNullOrWhiteSpace(mediaId))
                 throw new ArgumentException("mediaId错误");
-            if (string.IsNullOrWhiteSpace(kfAccount))
+            if(string.IsNullOrWhiteSpace(kfAccount))
                 throw new ArgumentException("customservice参数不能为空");
 
             string jsonString = "{\"touser\":\"OPENID\",\"msgtype\":\"image\",\"image\":{\"media_id\":\"MEDIA_ID\"},\"customservice\":{\"kf_account\":\"test1@kftest\"}}";
             jsonString = jsonString.Replace("OPENID", openId).Replace("MEDIA_ID", mediaId).Replace("test1@kftest", kfAccount);
-            return jsonString;
+            return SendToWeCart(jsonString, access_token);
         }
         #endregion
 
