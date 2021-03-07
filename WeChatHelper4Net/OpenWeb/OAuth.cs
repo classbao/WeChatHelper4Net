@@ -48,139 +48,107 @@ namespace WeChatHelper4Net.OpenWeb
 				);
 		}
 
-		/// <summary>
-		/// 通过code换取网页授权access_token。
-		/// 请注意，这里通过code换取的网页授权access_token,与基础支持中的access_token不同。
-		/// </summary>
-		/// <param name="code"></param>
-		/// <returns></returns>
-		public static AccessTokenModel GetOAuth(string code)
-		{
-			if (string.IsNullOrEmpty(code))
-			{
-				throw new Exception("code 为必填参数！");
-			}
+        /// <summary>
+        /// 通过code换取网页授权access_token。
+        /// 请注意，这里通过code换取的网页授权access_token,与基础支持中的access_token不同。
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static AccessTokenModel GetOAuth(string code)
+        {
+            if(string.IsNullOrEmpty(code))
+            {
+                throw new Exception("code 为必填参数！");
+            }
 
-			string url = string.Format("https://api.weixin.qq.com/sns/oauth2/access_token?appid={0}&secret={1}&code={2}&grant_type=authorization_code", Privacy.AppId, Privacy.AppSecret, code);
-			try
-			{
-				string result = HttpRequestHelper.Request(url);
-                PageOAuth_AccessToken model = JsonHelper.DeSerialize<PageOAuth_AccessToken>(result);
-				if (model == null || string.IsNullOrEmpty(model.openid))
-				{
-					StringBuilder msg = new StringBuilder("获取授权Openid失败，url=" + url);
-					msg.AppendLine(" ");
-					msg.AppendLine("result=" + result);
-					if (model == null)
-						msg.Append("AccessTokenModel=" + model);
-					else
-						msg.AppendFormat("errcode={0},errmsg={1}", model.errcode, model.errmsg);
-					//LogHelper.Save(msg.ToString(), "GetOAuth", LogType.Error, LogTime.day);
-				}
-				return model;
-			}
-			catch (Exception Ex)
-			{
-				LogHelper.Save(Ex);
-				throw Ex;
-			}
-		}
+            string url = string.Format("https://api.weixin.qq.com/sns/oauth2/access_token?appid={0}&secret={1}&code={2}&grant_type=authorization_code", Privacy.AppId, Privacy.AppSecret, code);
+            string result = HttpRequestHelper.Request(url);
+            PageOAuth_AccessToken model = JsonHelper.DeSerialize<PageOAuth_AccessToken>(result);
+            if(model == null || string.IsNullOrEmpty(model.openid))
+            {
+                StringBuilder msg = new StringBuilder("获取授权Openid失败，url=" + url);
+                msg.AppendLine(" ");
+                msg.AppendLine("result=" + result);
+                if(model == null)
+                    msg.Append("AccessTokenModel=" + model);
+                else
+                    msg.AppendFormat("errcode={0},errmsg={1}", model.errcode, model.errmsg);
+                //LogHelper.Save(msg.ToString(), "GetOAuth", LogType.Error, LogTime.day);
+            }
+            return model;
+        }
 
-		/// <summary>
-		/// 通过refresh_token刷新或续期access_token。
-		/// </summary>
-		/// <param name="refresh_token"></param>
-		/// <returns></returns>
-		public static AccessTokenModel RefreshToken(string refresh_token)
-		{
-			if (string.IsNullOrEmpty(refresh_token))
-			{
-				throw new Exception("refresh_token 为必填参数！");
-			}
+        /// <summary>
+        /// 通过refresh_token刷新或续期access_token。
+        /// </summary>
+        /// <param name="refresh_token"></param>
+        /// <returns></returns>
+        public static AccessTokenModel RefreshToken(string refresh_token)
+        {
+            if(string.IsNullOrEmpty(refresh_token))
+            {
+                throw new Exception("refresh_token 为必填参数！");
+            }
 
-			string url = string.Format("https://api.weixin.qq.com/sns/oauth2/refresh_token?appid={0}&grant_type=refresh_token&refresh_token={1}", Privacy.AppId, refresh_token);
-			try
-			{
-				string result = HttpRequestHelper.Request(url);
-                PageOAuth_AccessToken model = JsonHelper.DeSerialize<PageOAuth_AccessToken>(result);
-				if (model == null || string.IsNullOrEmpty(model.openid))
-				{
-					StringBuilder msg = new StringBuilder("刷新access_token有效期失败，url=" + url);
-					msg.AppendLine(" ");
-					msg.AppendLine("result=" + result);
-					if (model == null)
-						msg.Append("AccessTokenModel=" + model);
-					else
-						msg.AppendFormat("errcode={0},errmsg={1}", model.errcode, model.errmsg);
-					//LogHelper.Save(msg.ToString(), "GetOAuth", LogType.Error, LogTime.day);
-				}
-				return model;
-			}
-			catch (Exception Ex)
-			{
-				LogHelper.Save(Ex);
-				throw Ex;
-			}
-		}
+            string url = string.Format("https://api.weixin.qq.com/sns/oauth2/refresh_token?appid={0}&grant_type=refresh_token&refresh_token={1}", Privacy.AppId, refresh_token);
+            string result = HttpRequestHelper.Request(url);
+            PageOAuth_AccessToken model = JsonHelper.DeSerialize<PageOAuth_AccessToken>(result);
+            if(model == null || string.IsNullOrEmpty(model.openid))
+            {
+                StringBuilder msg = new StringBuilder("刷新access_token有效期失败，url=" + url);
+                msg.AppendLine(" ");
+                msg.AppendLine("result=" + result);
+                if(model == null)
+                    msg.Append("AccessTokenModel=" + model);
+                else
+                    msg.AppendFormat("errcode={0},errmsg={1}", model.errcode, model.errmsg);
+                //LogHelper.Save(msg.ToString(), "GetOAuth", LogType.Error, LogTime.day);
+            }
+            return model;
+        }
 
-		/// <summary>
-		/// 检验授权凭证（access_token）是否有效
-		/// </summary>
-		/// <param name="access_token">访问令牌</param>
-		/// <param name="openid"></param>
-		/// <returns></returns>
-		public static Boolean CheckToken(string access_token, string openid)
-		{
-			if (string.IsNullOrEmpty(access_token) || string.IsNullOrEmpty(openid))
-			{
-				return false;
-			}
+        /// <summary>
+        /// 检验授权凭证（access_token）是否有效
+        /// </summary>
+        /// <param name="access_token">访问令牌</param>
+        /// <param name="openid"></param>
+        /// <returns></returns>
+        public static Boolean CheckToken(string access_token, string openid)
+        {
+            if(string.IsNullOrEmpty(access_token) || string.IsNullOrEmpty(openid))
+            {
+                return false;
+            }
 
-			string url = string.Format("https://api.weixin.qq.com/sns/auth?access_token={0}&openid={1}", access_token, openid);
-			try
-			{
-				string result = HttpRequestHelper.Request(url);
-				RequestResultBaseModel model = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
-				if (model == null)
-				{
-					if (model.errcode == 0)
-						return true;
-				}
-			}
-			catch (Exception Ex)
-			{
-				LogHelper.Save(Ex);
-				throw Ex;
-			}
-			return false;
-		}
+            string url = string.Format("https://api.weixin.qq.com/sns/auth?access_token={0}&openid={1}", access_token, openid);
+            string result = HttpRequestHelper.Request(url);
+            RequestResultBaseModel model = JsonHelper.DeSerialize<RequestResultBaseModel>(result);
+            if(model == null)
+            {
+                if(model.errcode == 0)
+                    return true;
+            }
+            return false;
+        }
 
-		#region 获取用户基本信息
-		/// <summary>
-		/// 获取用户基本信息，返回JSON数据包
-		/// </summary>
-		/// <param name="access_token">访问令牌</param>
-		/// <param name="openid">普通用户的标识，对当前公众号唯一</param>
-		/// <returns>UserModel</returns>
-		public static UserModel GetUserInfo(string access_token, string openid)
-		{
-			if (string.IsNullOrEmpty(access_token) || string.IsNullOrEmpty(openid)) return new UserModel();
-			try
-			{
-				string url = string.Format("https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}", access_token, openid);
-				string result = HttpRequestHelper.Request(url, HttpRequestHelper.Method.GET);
-				if (!string.IsNullOrEmpty(result))
-				{
-					return JsonHelper.DeSerialize<UserModel>(result);
-				}
-			}
-			catch (Exception Ex)
-			{
-				LogHelper.Save(Ex, "", LogTime.day);
-				throw Ex;
-			}
-			return new UserModel();
-		}
+        #region 获取用户基本信息
+        /// <summary>
+        /// 获取用户基本信息，返回JSON数据包
+        /// </summary>
+        /// <param name="access_token">访问令牌</param>
+        /// <param name="openid">普通用户的标识，对当前公众号唯一</param>
+        /// <returns>UserModel</returns>
+        public static UserModel GetUserInfo(string access_token, string openid)
+        {
+            if(string.IsNullOrEmpty(access_token) || string.IsNullOrEmpty(openid)) return new UserModel();
+            string url = string.Format("https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}", access_token, openid);
+            string result = HttpRequestHelper.Request(url, HttpRequestHelper.Method.GET);
+            if(!string.IsNullOrEmpty(result))
+            {
+                return JsonHelper.DeSerialize<UserModel>(result);
+            }
+            return new UserModel();
+        }
 		#endregion
 
 	}

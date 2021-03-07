@@ -78,30 +78,30 @@ namespace WeChatHelper4Net.Models
         [DataMember(IsRequired = true)]
         public string openid { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public string nickname { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public int sex { get; set; }
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public string language { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public string province { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public string city { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public string country { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public string headimgurl { get; set; }
 
         /// <summary>
         /// 用户特权信息，json 数组，如微信沃卡用户为（chinaunicom）
         /// </summary>
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         public List<string> privilege { get; set; }
 
         /// <summary>
