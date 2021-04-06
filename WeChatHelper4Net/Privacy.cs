@@ -19,16 +19,16 @@ namespace WeChatHelper4Net
         /// <summary>
         /// 商户号（财付通商户身份标识 MCHID）
         /// </summary>
-        public static readonly string PartnerID = "12***01";
+        public static readonly string PartnerID = ConfigHelper.GetAppSetting("WeChatPartnerID"); //"12***01";
         /// <summary>
         /// 财付通商户权限密钥（API密钥）
         /// </summary>
-        public static readonly string PartnerKey = "b1***2500"; //"91013efa57330c52680016f602ff912c";
+        public static readonly string PartnerKey = ConfigHelper.GetAppSetting("WeChatPartnerKey"); //"91013efa57330c52680016f602ff912c";
 
         /// <summary>
         /// 微信公众号支付请求中用于加密的秘钥paySignKey，对应于支付场景中的AppKey
         /// </summary>
-        public static readonly string AppKey = "hn***FM";
+        public static readonly string AppKey = ConfigHelper.GetAppSetting("WeChatpaySignKey"); //"hn***FM";
 
         #endregion
 
