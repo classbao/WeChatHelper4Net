@@ -399,8 +399,9 @@ namespace WeChatHelper4Net
         /// <returns></returns>
         public static bool IsHeadimgurl(string headimgurl)
         {
-            if (!string.IsNullOrWhiteSpace(headimgurl))
-                return headimgurl.StartsWith("http://wx.qlogo.cn/");
+            // http://thirdwx.qlogo.cn/mmopen/KrhD3NZ4r0mbxbKZiahgc1ibeXTtnpqe5xxllMqc03DlCWjmJWqGoJkWLHm0EIAiajkicbFKOzYaSlbPhIFSGyeHckUpviaxpYNvib/132
+            if(!string.IsNullOrWhiteSpace(headimgurl))
+                return headimgurl.Contains(".qlogo.cn/");
             return false;
         }
 
