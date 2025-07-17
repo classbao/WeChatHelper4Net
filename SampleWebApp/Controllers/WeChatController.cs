@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml;
 using WeChatHelper4Net;
 using WeChatHelper4Net.CustomService;
 using WeChatHelper4Net.Extend;
@@ -84,6 +85,9 @@ namespace SampleWebApp.Controllers
             }
         }
 
+        // 使用静态方法避免重复分配资源（对于高频接收微信消息的场景：性能优化建议）
+        private static readonly XmlDocument xmlDoc = new XmlDocument();
+
         /// <summary>
         /// 响应消息推送，接收微信服务器推送来的请求或消息或事件或结果。
         /// 需同时支持接收HttpGet，HttpPost两种请求。
@@ -93,20 +97,28 @@ namespace SampleWebApp.Controllers
         //[HttpGet, HttpPost]
         public ActionResult Index()
         {
+            #region 微信平台基本参数（URL验证、签名验证等）
+            string signature = Request["signature"];
+            string timestamp = Request["timestamp"];
+            string nonce = Request["nonce"];
+            string echostr = Request["echostr"];
+            #endregion
+
+            #region 微信平台消息基本参数
+            string encrypt_type = Request["encrypt_type"];
+            string msg_signature = Request["msg_signature"];
+            string openid = Request["openid"]; // 用户在单个公众号/小程序中的唯一标识，长度固定为28个字符
+            string unionid = Request["unionid"]; // 用户在微信开放平台账号下的唯一标识（需要将应用绑定到同一微信开放平台账号下），长度固定为32个字符
+            #endregion
+
             if("GET" == Request.HttpMethod)
             {
                 //微信后台验证地址（使用Get），微信后台的“接口配置信息”的Url填写如：http://weixin.classbao.com/WeChat
                 LogHelper.Save(nameof(Index) + "> 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName, nameof(WeChatController), LogType.Common, LogTime.day);
                 #region 微信后台验证地址（使用Get），微信后台的“接口配置信息”的Url
-                var signature = Request["signature"];
-                var timestamp = Request["timestamp"];
-                var nonce = Request["nonce"];
-                var echostr = Request["echostr"];
+                // 当前AbsoluteUri=http://pay.networkhand.com/WeChat/Index?signature=25ba683ee96c511ff98c96878621871d8d6144d2&echostr=2260961169926406011&timestamp=1751791226&nonce=617425447，ContentEncoding=System.Text.UTF8Encoding，ContentType=，RequestType=GET，HttpMethod=GET，UserHostAddress=121.4.104.160，UserHostName=121.4.104.160
 
-                // 自定义Token
-                string Token = ConfigHelper.GetAppSetting("WeChatToken");
-
-                var result = ValidationToken.Validation(signature, timestamp, nonce, echostr, Token);
+                var result = ValidationToken.Validation(signature, timestamp, nonce, echostr, WeChatHelper4Net.Common.Token);
                 if(!string.IsNullOrWhiteSpace(result))
                 {
                     return Content(result);
@@ -119,503 +131,565 @@ namespace SampleWebApp.Controllers
             }
             else if("POST" == Request.HttpMethod)
             {
-                string receivedPostString = ReceivingMessage.StreamToString(Request.InputStream); //System.Web.HttpContext.Current.Request.InputStream;
-                //log.Info("Index，receivedPostString=<code><pre>" + receivedPostString + "</pre></code>");
-                if(!string.IsNullOrWhiteSpace(receivedPostString))
+                string _xmlData;
+                lock(xmlDoc) // 多线程安全
                 {
-                    string MsgType = ReceivingMessage.GetMsgType(receivedPostString);
-                    //log.Info("Index，MsgType=" + MsgType);
-                    switch(MsgType)
+                    using(var reader = new System.IO.StreamReader(Request.InputStream)) // HttpRequest.InputStream 是一次性的流:只能读取一次：一旦读取后，流的位置会到达末尾，再次读取将得不到数据
                     {
-                        #region 接收普通消息
-                        case "text":
-                            #region MyRegion
-                            try
-                            {
-                                var msg = XmlHelper.DeSerialize<ReceivedTextModel>(receivedPostString);
-                                //log.Info("Index，MsgId=" + msg.MsgId + "，MsgType=" + msg.MsgType + "，FromUserName=" + msg.FromUserName + "，ToUserName=" + msg.ToUserName + "，CreateTime=" + msg.CreateTime + "，Content=" + msg.Content);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    //Models.wxCustomHandler.TextMessage(msg);
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        case "image":
-                            #region MyRegion
-                            try
-                            {
-                                var msg = XmlHelper.DeSerialize<ReceivedImageModel>(receivedPostString);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    /*
-                                    var result = SendMessage.NewsToUser(msg.FromUserName, new List<NewsModel>() {
-                                        new NewsModel() { title = "已经收到图片消息", description = msg.PicUrl, picurl = msg.PicUrl, url = Common.WeChatDomainName + Url.Action("receivePic","Activity",new{PicUrl=HttpUtility.UrlPathEncode(msg.PicUrl)}) }
-                                    }, Models.TokenOrTicket.GetAccessToken().access_token);
-                                    */
+                        _xmlData = reader.ReadToEnd();
+                    }
 
-                                    // 图片活动·开始
-                                    /*
-                                    int id = ActivityController.GetActivityscore(msg, new Onexz.Model.APIModel() { custom = "YMCS2015" });
-                                    if (id <= 0)
+                    LogHelper.Save(nameof(Index) + "> 当前AbsoluteUri=" + Request.Url.AbsoluteUri + "，ContentEncoding=" + Request.ContentEncoding.ToString() + "，ContentType=" + Request.ContentType + "，RequestType=" + Request.RequestType + "，HttpMethod=" + Request.HttpMethod + "，UserHostAddress=" + Request.UserHostAddress + "，UserHostName=" + Request.UserHostName + "，_xmlData=" + _xmlData, nameof(WeChatController), LogType.Common, LogTime.day);
+                    //log.Info("Index，_xmlData=<code><pre>" + _xmlData + "</pre></code>");
+                    /*
+当前AbsoluteUri=http://pay.networkhand.com/WeChat/Index?signature=caabbfa04b21619c92b721dffa7a90740c816cf5&timestamp=1751792721&nonce=1071556065&openid=oJW2E7F4rvViuRc2Nxn9IurKaEyQ&encrypt_type=aes&msg_signature=cb252412f96df7c4d331f9308c34eeb52c997322，ContentEncoding=System.Text.UTF8Encoding，ContentType=text/xml，RequestType=POST，HttpMethod=POST，UserHostAddress=124.223.188.110，UserHostName=124.223.188.110，receivedPostString=<xml>
+    <ToUserName><![CDATA[gh_044554e67c7a]]></ToUserName>
+    <Encrypt><![CDATA[y9yBMnr14wIvEXEbD20kx63IAJ6sB/CcLHc+OeMcWYkLMzqom0QWzXlYvo8DUp9AblreQTXAWRhCmRQja9dT3e8UfYc6A8pL4XEKi8WBL6PyMTnJ7Fe+0uF9kmNMj/83wUIycok7tcOfuz0wbnZhTPXKp2wti+7rfXPfw6Ww0YgBlh2twUaqViGw5xVhKGCvoIBQb5B3Oa/1fH+nfLD3bAnjlEJ8yGwJva5fBbqAUnl1hP0N2dnTzyNauDCFIoPwaXgu+1Yz/ITgJIz6s5PdgRZs576nAa0vbCXQHHMlwT6xUJrAEAnGb3dZFeKVG1PeWCsN3w/kJaVe7tzw63U0nmYlpxEYOCzoHx5Emqasr3/Ol9gyS4zJyikMMVxObRt42dBZS3G4oCQ2lGRVSC+BrxcK+AgJzka9HR9UkGnwo1A=]]></Encrypt>
+</xml>
+                 */
+                    #region 兼容“安全模式”处理消息加密解密
+
+                    if("aes" == encrypt_type)
+                    {
+                        /*
+                         * 服务器配置(已启用)：安全模式
+                         * 消息加密类型：目前微信只能是EncodingAESKey 
+                         */
+                        var msg = new Tencent.WXBizMsgCrypt(WeChatHelper4Net.Common.Token, WeChatHelper4Net.Common.EncodingAESKey, WeChatHelper4Net.Common.AppId);
+                        msg.DecryptMsg(msg_signature, timestamp, nonce, _xmlData, ref _xmlData);
+                        /*微信消息AES解密之前（示例）：
+    <xml>
+        <ToUserName><![CDATA[gh_044554e67c7a]]></ToUserName>
+        <Encrypt><![CDATA[y9yBMnr14wIvEXEbD20kx63IAJ6sB/CcLHc+OeMcWYkLMzqom0QWzXlYvo8DUp9AblreQTXAWRhCmRQja9dT3e8UfYc6A8pL4XEKi8WBL6PyMTnJ7Fe+0uF9kmNMj/83wUIycok7tcOfuz0wbnZhTPXKp2wti+7rfXPfw6Ww0YgBlh2twUaqViGw5xVhKGCvoIBQb5B3Oa/1fH+nfLD3bAnjlEJ8yGwJva5fBbqAUnl1hP0N2dnTzyNauDCFIoPwaXgu+1Yz/ITgJIz6s5PdgRZs576nAa0vbCXQHHMlwT6xUJrAEAnGb3dZFeKVG1PeWCsN3w/kJaVe7tzw63U0nmYlpxEYOCzoHx5Emqasr3/Ol9gyS4zJyikMMVxObRt42dBZS3G4oCQ2lGRVSC+BrxcK+AgJzka9HR9UkGnwo1A=]]></Encrypt>
+    </xml>
+
+                    微信消息AES解密之后（示例）：
+    <xml><ToUserName><![CDATA[gh_044554e67c7a]]></ToUserName>
+    <FromUserName><![CDATA[oJW2E7F4rvViuRc2Nxn9IurKaEyQ]]></FromUserName>
+    <CreateTime>1751792721</CreateTime>
+    <MsgType><![CDATA[text]]></MsgType>
+    <Content><![CDATA[123456]]></Content>
+    <MsgId>25079645217338616</MsgId>
+    </xml>
+                         */
+                    }
+                    else
+                    {
+                        /*
+                         * 服务器配置(已启用)：明文模式
+                        */
+                    }
+
+                    xmlDoc.LoadXml(_xmlData);
+
+                    #endregion
+
+                    // xmlDoc.SelectSingleNode("xml/ToUserName")?.InnerText
+                    // xmlDoc.SelectSingleNode("xml/Encrypt")?.InnerText
+                    // 处理逻辑...
+                    #region 处理逻辑
+                    if(!string.IsNullOrWhiteSpace(_xmlData) && null != xmlDoc && xmlDoc.HasChildNodes)
+                    {
+                        string wx_ToUserName = xmlDoc.SelectSingleNode("xml/ToUserName")?.InnerText;
+                        string wx_FromUserName = xmlDoc.SelectSingleNode("xml/FromUserName")?.InnerText;
+                        string wx_CreateTime = xmlDoc.SelectSingleNode("xml/CreateTime")?.InnerText;
+                        string wx_MsgType = xmlDoc.SelectSingleNode("xml/MsgType")?.InnerText;
+                        string wx_Content = xmlDoc.SelectSingleNode("xml/Content")?.InnerText;
+                        string wx_MsgId = xmlDoc.SelectSingleNode("xml/MsgId")?.InnerText;
+
+                        //log.Info("Index，MsgType=" + MsgType);
+                        switch(wx_MsgType)
+                        {
+                            #region 接收普通消息
+                            case "text":
+                                #region MyRegion
+                                try
+                                {
+                                    LogHelper.Save($"wx_MsgId={wx_MsgId}，wx_MsgType={wx_MsgType}，wx_CreateTime={wx_CreateTime}，wx_ToUserName={wx_ToUserName}，wx_FromUserName={wx_FromUserName}，wx_Content={wx_Content}", nameof(WeChatController) + "_" + nameof(Index) + "_", LogType.Common, LogTime.day);
+                                    //log.Info("Index，MsgId=" + msg.MsgId + "，MsgType=" + msg.MsgType + "，FromUserName=" + msg.FromUserName + "，ToUserName=" + msg.ToUserName + "，CreateTime=" + msg.CreateTime + "，Content=" + msg.Content);
+                                    Task.Factory.StartNew(() =>
                                     {
-                                        //1，下载图片保存到本地服务器
-                                        Onexz.Model.APIModel saveImageApi = DownloadMultimediaFiles(msg.MediaId, msg.MsgType, "OfficialActivity");
-                                        if (saveImageApi != null && saveImageApi.errno == 0 && !string.IsNullOrWhiteSpace(saveImageApi.data.ToString()))
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        //Models.wxCustomHandler.TextMessage(msg);
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            case "image":
+                                #region MyRegion
+                                try
+                                {
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        /*
+                                        var result = SendMessage.NewsToUser(msg.FromUserName, new List<NewsModel>() {
+                                            new NewsModel() { title = "已经收到图片消息", description = msg.PicUrl, picurl = msg.PicUrl, url = Common.WeChatDomainName + Url.Action("receivePic","Activity",new{PicUrl=HttpUtility.UrlPathEncode(msg.PicUrl)}) }
+                                        }, Models.TokenOrTicket.GetAccessToken().access_token);
+                                        */
+
+                                        // 图片活动·开始
+                                        /*
+                                        int id = ActivityController.GetActivityscore(msg, new Onexz.Model.APIModel() { custom = "YMCS2015" });
+                                        if (id <= 0)
                                         {
-                                            //2，图片记录到活动表
-                                            saveImageApi.custom = "YMCS2015"; //“壹抹春色”手机摄影大赛
-                                            id = ActivityController.activityscoreRecordFile(msg, saveImageApi);
+                                            //1，下载图片保存到本地服务器
+                                            Onexz.Model.APIModel saveImageApi = DownloadMultimediaFiles(msg.MediaId, msg.MsgType, "OfficialActivity");
+                                            if (saveImageApi != null && saveImageApi.errno == 0 && !string.IsNullOrWhiteSpace(saveImageApi.data.ToString()))
+                                            {
+                                                //2，图片记录到活动表
+                                                saveImageApi.custom = "YMCS2015"; //“壹抹春色”手机摄影大赛
+                                                id = ActivityController.activityscoreRecordFile(msg, saveImageApi);
+                                            }
+                                            if (id < 1)
+                                            {
+                                                SendMessage.TextToUser(msg.FromUserName, "图片文件接收失败，请稍后再试。", Models.TokenOrTicket.GetAccessToken().access_token);
+                                            }
+                                            else
+                                            {
+                                                SendMessage.TextToUser(administratorOpenID, Common.WeChatName + "收到一条图片消息，" + Common.ConvertTime(msg.CreateTime) + "\r\nMediaId=" + msg.MediaId + "\r\nPicUrl=" + msg.PicUrl, Models.TokenOrTicket.GetAccessToken().access_token);
+                                            }
+                                            // 图片活动·结束 
+                                            log.Debug("回复完成>> OpenID=" + msg.FromUserName + "    CreateTime=" + msg.CreateTime + "    PicUrl=" + msg.PicUrl + "    回复类型=发送图文消息<br />");
                                         }
-                                        if (id < 1)
+                                        if (id > 0)
                                         {
-                                            SendMessage.TextToUser(msg.FromUserName, "图片文件接收失败，请稍后再试。", Models.TokenOrTicket.GetAccessToken().access_token);
+                                            //该图片已经记录
+                                            var result = SendMessage.NewsToUser(msg.FromUserName, new List<NewsModel>() {
+                                                new NewsModel() { title = "我的摄影作品入选“壹抹春色”手机摄影大赛，美极啦！", description = "非常感谢参与2015年“壹抹春色”随手拍校园摄影大赛，你的作品美极了！", picurl = msg.PicUrl, url = Common.WeChatDomainName + Url.Action("YMCS2015","Activity",new{id=id}) }
+                                            }, Models.TokenOrTicket.GetAccessToken().access_token);
+                                        }
+                                        */
+
+                                        SendMsg.SendText(administratorOpenID,TimestampHelper.ConvertTime(wx_CreateTime) + Common.WeChatName + "收到一条图片消息" + "\r\nMediaId=" + xmlDoc.SelectSingleNode("xml/MediaId")?.InnerText + "\r\nPicUrl=" + xmlDoc.SelectSingleNode("xml/PicUrl")?.InnerText, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            case "voice":
+                                #region MyRegion
+                                try
+                                {
+                                    //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedVoiceModel>(receivedPostString);
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条语音消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            case "video":
+                                #region MyRegion
+                                try
+                                {
+                                    //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedVideoModel>(receivedPostString);
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条视频消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            case "shortvideo":
+                                #region MyRegion
+                                try
+                                {
+                                    //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedVideoModel>(receivedPostString);
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条小视频消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            case "location":
+                                #region MyRegion
+                                try
+                                {
+                                    /*
+                                    var msg = XmlHelper.DeSerialize<ReceivedLocationModel>(receivedPostString);
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        UserLocationModel location = new UserLocationModel()
+                                        {
+                                            FromUserName = msg.FromUserName,
+                                            Latitude = msg.Location_X,
+                                            Longitude = msg.Location_Y,
+                                            Precision = Convert.ToDecimal(msg.Scale),
+                                            Location_X = msg.Location_X,
+                                            Location_Y = msg.Location_Y,
+                                            Scale = msg.Scale,
+                                            Label = msg.Label,
+                                            CreateTime = msg.CreateTime
+                                        };
+                                        CacheHelper.SetCache("1xuezhe_location_" + msg.FromUserName, location, 10);
+
+                                        UserLocationModel locationCache = (UserLocationModel)CacheHelper.GetCache("1xuezhe_location_" + msg.FromUserName);
+                                        if (locationCache != null)
+                                        {
+                                            StringBuilder _msg = new StringBuilder();
+                                            _msg.AppendLine("您的当前地理位置信息：location");
+                                            _msg.AppendLine("纬度：" + locationCache.Location_X);
+                                            _msg.AppendLine("经度：" + locationCache.Location_Y);
+                                            _msg.AppendLine("地图缩放大小：" + locationCache.Scale);
+                                            _msg.AppendLine("地理位置信息：" + locationCache.Label);
+                                            _msg.AppendLine("cachekey：" + "1xuezhe_location_" + msg.FromUserName);
+                                            SendMessage.TextToUser(locationCache.FromUserName, _msg.ToString(), Models.TokenOrTicket.GetAccessToken().access_token);
+                                        }
+                                        //LogHelper.Save("ToUserName=" + msg.ToUserName + "    FromUserName=" + msg.FromUserName + "    Location_X=" + msg.Location_X + "    Location_Y=" + msg.Location_Y + "    Scale=" + msg.Scale + "    Label=" + msg.Label + "    CreateTime=" + msg.CreateTime, "地理位置消息", LogType.Report, LogTime.day);
+
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                    */
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            case "link":
+                                #region MyRegion
+                                try
+                                {
+                                    //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedLinkModel>(receivedPostString);
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        AsyncManager.OutstandingOperations.Increment();
+                                        SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条链接消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                        AsyncManager.OutstandingOperations.Decrement();
+                                    });
+                                }
+                                catch(Exception Ex)
+                                {
+                                    //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
+                                }
+                                #endregion
+                                break;
+                            #endregion
+                            #region 接收事件推送
+                            case "event":
+                                string Event = xmlDoc.SelectSingleNode("xml/Event")?.InnerText;
+                                switch(Event)
+                                {
+                                    case "subscribe":
+                                        #region MyRegion
+                                        if(!xmlDoc.SelectSingleNode("xml/Content").InnerText.Contains("qrscene_"))
+                                        {
+                                            try
+                                            {
+
+                                                //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
+                                                Task.Factory.StartNew(() =>
+                                                {
+                                                    AsyncManager.OutstandingOperations.Increment();
+                                                    //new Models.wxUserService().handleSubscribe(msg.FromUserName);
+                                                    AsyncManager.OutstandingOperations.Decrement();
+
+                                                    AsyncManager.OutstandingOperations.Increment();
+                                                    SendMsg.SendText(administratorOpenID, TimestampHelper.ConvertTime(xmlDoc.SelectSingleNode("xml/CreateTime")?.InnerText) + Common.WeChatName + "收到一个用户关注：\r\n" + wx_FromUserName, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                                    AsyncManager.OutstandingOperations.Decrement();
+                                                });
+
+                                                return Content(PassiveReply.ReplyText(new WeChatHelper4Net.Models.PassiveReply.ReplyTextModel()
+                                                {
+                                                    ToUserName = wx_FromUserName,
+                                                    CreateTime = TimestampHelper.ConvertTime(DateTime.Now),
+                                                    Content = AutoWelcomeMessage
+                                                }));
+                                            }
+                                            catch(Exception Ex)
+                                            {
+                                                //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
+                                            }
                                         }
                                         else
                                         {
-                                            SendMessage.TextToUser(administratorOpenID, Common.WeChatName + "收到一条图片消息，" + Common.ConvertTime(msg.CreateTime) + "\r\nMediaId=" + msg.MediaId + "\r\nPicUrl=" + msg.PicUrl, Models.TokenOrTicket.GetAccessToken().access_token);
+                                            try
+                                            {
+                                                //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，EventKey=" + msg.EventKey + "，Ticket=" + msg.Ticket + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
+                                                string qrscene = xmlDoc.SelectSingleNode("xml/EventKey").InnerText.Replace("qrscene_", "").Trim();
+                                                Task.Factory.StartNew(() =>
+                                                {
+                                                    AsyncManager.OutstandingOperations.Increment();
+                                                    //new Models.wxUserService().handleSubscribe(msg.FromUserName, qrscene);
+                                                    AsyncManager.OutstandingOperations.Decrement();
+
+                                                    AsyncManager.OutstandingOperations.Increment();
+                                                    SendMsg.SendText(administratorOpenID, TimestampHelper.ConvertTime(wx_CreateTime) + Common.WeChatName + "收到一个扫码关注：\r\n" + wx_FromUserName, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                                    AsyncManager.OutstandingOperations.Decrement();
+                                                });
+
+                                                return Content(PassiveReply.ReplyText(new WeChatHelper4Net.Models.PassiveReply.ReplyTextModel()
+                                                {
+                                                    ToUserName = wx_FromUserName,
+                                                    CreateTime = TimestampHelper.ConvertTime(DateTime.Now),
+                                                    Content = AutoWelcomeMessage
+                                                }));
+                                            }
+                                            catch(Exception Ex)
+                                            {
+                                                //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
+                                            }
                                         }
-                                        // 图片活动·结束 
-                                        log.Debug("回复完成>> OpenID=" + msg.FromUserName + "    CreateTime=" + msg.CreateTime + "    PicUrl=" + msg.PicUrl + "    回复类型=发送图文消息<br />");
-                                    }
-                                    if (id > 0)
-                                    {
-                                        //该图片已经记录
-                                        var result = SendMessage.NewsToUser(msg.FromUserName, new List<NewsModel>() {
-                                            new NewsModel() { title = "我的摄影作品入选“壹抹春色”手机摄影大赛，美极啦！", description = "非常感谢参与2015年“壹抹春色”随手拍校园摄影大赛，你的作品美极了！", picurl = msg.PicUrl, url = Common.WeChatDomainName + Url.Action("YMCS2015","Activity",new{id=id}) }
-                                        }, Models.TokenOrTicket.GetAccessToken().access_token);
-                                    }
-                                    */
-
-                                    SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一条图片消息" + "\r\nMediaId=" + msg.MediaId + "\r\nPicUrl=" + msg.PicUrl, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        case "voice":
-                            #region MyRegion
-                            try
-                            {
-                                //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedVoiceModel>(receivedPostString);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条语音消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        case "video":
-                            #region MyRegion
-                            try
-                            {
-                                //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedVideoModel>(receivedPostString);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条视频消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        case "shortvideo":
-                            #region MyRegion
-                            try
-                            {
-                                //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedVideoModel>(receivedPostString);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条小视频消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        case "location":
-                            #region MyRegion
-                            try
-                            {
-                                /*
-                                var msg = XmlHelper.DeSerialize<ReceivedLocationModel>(receivedPostString);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    UserLocationModel location = new UserLocationModel()
-                                    {
-                                        FromUserName = msg.FromUserName,
-                                        Latitude = msg.Location_X,
-                                        Longitude = msg.Location_Y,
-                                        Precision = Convert.ToDecimal(msg.Scale),
-                                        Location_X = msg.Location_X,
-                                        Location_Y = msg.Location_Y,
-                                        Scale = msg.Scale,
-                                        Label = msg.Label,
-                                        CreateTime = msg.CreateTime
-                                    };
-                                    CacheHelper.SetCache("1xuezhe_location_" + msg.FromUserName, location, 10);
-
-                                    UserLocationModel locationCache = (UserLocationModel)CacheHelper.GetCache("1xuezhe_location_" + msg.FromUserName);
-                                    if (locationCache != null)
-                                    {
-                                        StringBuilder _msg = new StringBuilder();
-                                        _msg.AppendLine("您的当前地理位置信息：location");
-                                        _msg.AppendLine("纬度：" + locationCache.Location_X);
-                                        _msg.AppendLine("经度：" + locationCache.Location_Y);
-                                        _msg.AppendLine("地图缩放大小：" + locationCache.Scale);
-                                        _msg.AppendLine("地理位置信息：" + locationCache.Label);
-                                        _msg.AppendLine("cachekey：" + "1xuezhe_location_" + msg.FromUserName);
-                                        SendMessage.TextToUser(locationCache.FromUserName, _msg.ToString(), Models.TokenOrTicket.GetAccessToken().access_token);
-                                    }
-                                    //LogHelper.Save("ToUserName=" + msg.ToUserName + "    FromUserName=" + msg.FromUserName + "    Location_X=" + msg.Location_X + "    Location_Y=" + msg.Location_Y + "    Scale=" + msg.Scale + "    Label=" + msg.Label + "    CreateTime=" + msg.CreateTime, "地理位置消息", LogType.Report, LogTime.day);
-                                    
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                                */
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        case "link":
-                            #region MyRegion
-                            try
-                            {
-                                //var msg = WeiXinAPI.XmlHelper.DeSerialize<ReceivedLinkModel>(receivedPostString);
-                                Task.Factory.StartNew(() =>
-                                {
-                                    AsyncManager.OutstandingOperations.Increment();
-                                    SendMsg.SendText(administratorOpenID, DateTime.Now + Common.WeChatName + "收到一条链接消息", Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                    AsyncManager.OutstandingOperations.Decrement();
-                                });
-                            }
-                            catch(Exception Ex)
-                            {
-                                //log.Error(string.Format("Index > MsgType={0}", MsgType, receivedPostString), Ex);
-                            }
-                            #endregion
-                            break;
-                        #endregion
-                        #region 接收事件推送
-                        case "event":
-                            string Event = ReceivingMessage.GetEvent(receivedPostString);
-                            switch(Event)
-                            {
-                                case "subscribe":
-                                    #region MyRegion
-                                    if(!ReceivingMessage.ContainQrscene(receivedPostString))
-                                    {
+                                        #endregion
+                                        break;
+                                    case "unsubscribe":
+                                        #region MyRegion
                                         try
                                         {
-                                            var msg = XmlHelper.DeSerialize<ReceivedSubscribeModel>(receivedPostString);
                                             //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
                                             Task.Factory.StartNew(() =>
                                             {
                                                 AsyncManager.OutstandingOperations.Increment();
-                                                //new Models.wxUserService().handleSubscribe(msg.FromUserName);
-                                                AsyncManager.OutstandingOperations.Decrement();
-
-                                                AsyncManager.OutstandingOperations.Increment();
-                                                SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一个用户关注：\r\n" + msg.FromUserName, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                                //new Models.wxUserService().handleUnsubscribe(msg.FromUserName);
                                                 AsyncManager.OutstandingOperations.Decrement();
                                             });
 
                                             return Content(PassiveReply.ReplyText(new WeChatHelper4Net.Models.PassiveReply.ReplyTextModel()
                                             {
-                                                ToUserName = msg.FromUserName,
-                                                CreateTime = Common.ConvertTime(DateTime.Now),
-                                                Content = AutoWelcomeMessage
+                                                ToUserName = wx_FromUserName,
+                                                CreateTime = TimestampHelper.ConvertTime(DateTime.Now),
+                                                Content = "是什么原因让您决定取消订阅（关注）" + Common.WeChatName + "？"
                                             }));
                                         }
                                         catch(Exception Ex)
                                         {
                                             //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
                                         }
-                                    }
-                                    else
-                                    {
+                                        #endregion
+                                        break;
+                                    case "SCAN":
+                                        #region MyRegion
+                                        //try
+                                        //{
+                                        //    var msg = XmlHelper.DeSerialize<ReceivedScanModel>(receivedPostString);
+                                        //    int scene_id = Convert.ToInt32(msg.EventKey);
+                                        //    string ticket = msg.Ticket;
+                                        //    Task.Factory.StartNew(() =>
+                                        //    {
+                                        //        AsyncManager.OutstandingOperations.Increment();
+                                        //        //...
+                                        //        AsyncManager.OutstandingOperations.Decrement();
+                                        //        //return;
+                                        //    });
+
+                                        //    SendMessage.TextToUser(msg.FromUserName, "欢迎您扫描我们的二维码", Models.TokenOrTicket.GetAccessToken().access_token);
+                                        //}
+                                        //catch(Exception Ex)
+                                        //{
+                                        //    //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
+                                        //}
+                                        #endregion
+                                        break;
+                                    case "LOCATION":
+                                        #region MyRegion
+                                        /*
                                         try
                                         {
-                                            var msg = XmlHelper.DeSerialize<ReceivedScanModel>(receivedPostString);
-                                            //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，EventKey=" + msg.EventKey + "，Ticket=" + msg.Ticket + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
-                                            string qrscene = msg.EventKey.Replace("qrscene_", "").Trim();
+                                            var msg = XmlHelper.DeSerialize<ReceivedLOCATIONModel>(receivedPostString);
+                                            UserLocationModel location = new UserLocationModel()
+                                            {
+                                                FromUserName = msg.FromUserName,
+                                                Latitude = msg.Latitude,
+                                                Longitude = msg.Longitude,
+                                                Precision = msg.Precision,
+                                                Location_X = msg.Latitude,
+                                                Location_Y = msg.Longitude,
+                                                Scale = Convert.ToInt32(msg.Precision),
+                                                Label = string.Empty,
+                                                CreateTime = msg.CreateTime
+                                            };
+                                            CacheHelper.SetCache("1xuezhe_location_" + msg.FromUserName, location, 10);
+
+                                            UserLocationModel LOCATIONCache = (UserLocationModel)CacheHelper.GetCache("1xuezhe_location_" + msg.FromUserName);
+                                            if(LOCATIONCache != null)
+                                            {
+                                                StringBuilder _msg = new StringBuilder();
+                                                _msg.AppendLine("您的当前地理位置信息：LOCATION");
+                                                _msg.AppendLine("纬度：" + LOCATIONCache.Latitude);
+                                                _msg.AppendLine("经度：" + LOCATIONCache.Longitude);
+                                                _msg.AppendLine("精度：" + LOCATIONCache.Precision);
+                                                _msg.AppendLine("Scale：" + LOCATIONCache.Scale);
+                                                _msg.AppendLine("FromUser：" + LOCATIONCache.FromUserName);
+                                                _msg.AppendLine("cachekey：" + "1xuezhe_location_" + msg.FromUserName);
+                                                SendMessage.TextToUser(LOCATIONCache.FromUserName, _msg.ToString(), Models.TokenOrTicket.GetAccessToken().access_token);
+                                            }
+                                            LogHelper.Save("ToUserName=" + msg.ToUserName + "    FromUserName=" + msg.FromUserName + "    Latitude=" + msg.Latitude + "    Longitude=" + msg.Longitude + "    Precision=" + msg.Precision + "    CreateTime=" + msg.CreateTime, "上报地理位置事件", LogType.Report, LogTime.day);
+
+                                        }
+                                        catch(Exception Ex)
+                                        {
+                                            //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
+                                        }
+                                        */
+                                        #endregion
+                                        break;
+                                    case "CLICK":
+                                        #region MyRegion
+                                        try
+                                        {
+                                            //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，EventKey=" + msg.EventKey + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
                                             Task.Factory.StartNew(() =>
                                             {
                                                 AsyncManager.OutstandingOperations.Increment();
-                                                //new Models.wxUserService().handleSubscribe(msg.FromUserName, qrscene);
+                                                //Models.wxCustomHandler.ClickEventHandler(msg);
                                                 AsyncManager.OutstandingOperations.Decrement();
 
-                                                AsyncManager.OutstandingOperations.Increment();
-                                                SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到一个扫码关注：\r\n" + msg.FromUserName, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                                AsyncManager.OutstandingOperations.Decrement();
+                                                //AsyncManager.OutstandingOperations.Increment();
+                                                SendMsg.SendText(wx_FromUserName, "您点击了菜单，EventKey=" + xmlDoc.SelectSingleNode("xml/EventKey")?.InnerText, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                                //AsyncManager.OutstandingOperations.Decrement();
                                             });
-
-                                            return Content(PassiveReply.ReplyText(new WeChatHelper4Net.Models.PassiveReply.ReplyTextModel()
-                                            {
-                                                ToUserName = msg.FromUserName,
-                                                CreateTime = Common.ConvertTime(DateTime.Now),
-                                                Content = AutoWelcomeMessage
-                                            }));
                                         }
                                         catch(Exception Ex)
                                         {
                                             //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
                                         }
-                                    }
-                                    #endregion
-                                    break;
-                                case "unsubscribe":
-                                    #region MyRegion
-                                    try
-                                    {
-                                        var msg = XmlHelper.DeSerialize<ReceivedSubscribeModel>(receivedPostString);
-                                        //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
-                                        Task.Factory.StartNew(() =>
-                                        {
-                                            AsyncManager.OutstandingOperations.Increment();
-                                            //new Models.wxUserService().handleUnsubscribe(msg.FromUserName);
-                                            AsyncManager.OutstandingOperations.Decrement();
-                                        });
+                                        #endregion
+                                        break;
+                                    case "VIEW":
+                                        #region MyRegion
+                                        //try
+                                        //{
+                                        //    var msg = XmlHelper.DeSerialize<ReceivedViewModel>(receivedPostString);
+                                        //}
+                                        //catch(Exception Ex)
+                                        //{
+                                        //    //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
+                                        //}
+                                        #endregion
+                                        break;
 
-                                        return Content(PassiveReply.ReplyText(new WeChatHelper4Net.Models.PassiveReply.ReplyTextModel()
+                                    case "MASSSENDJOBFINISH":
+                                        #region MyRegion
+                                        try
                                         {
-                                            ToUserName = msg.FromUserName,
-                                            CreateTime = Common.ConvertTime(DateTime.Now),
-                                            Content = "是什么原因让您决定取消订阅（关注）" + Common.WeChatName + "？"
-                                        }));
-                                    }
-                                    catch(Exception Ex)
-                                    {
-                                        //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    }
-                                    #endregion
-                                    break;
-                                case "SCAN":
-                                    #region MyRegion
-                                    //try
-                                    //{
-                                    //    var msg = XmlHelper.DeSerialize<ReceivedScanModel>(receivedPostString);
-                                    //    int scene_id = Convert.ToInt32(msg.EventKey);
-                                    //    string ticket = msg.Ticket;
-                                    //    Task.Factory.StartNew(() =>
-                                    //    {
-                                    //        AsyncManager.OutstandingOperations.Increment();
-                                    //        //...
-                                    //        AsyncManager.OutstandingOperations.Decrement();
-                                    //        //return;
-                                    //    });
-
-                                    //    SendMessage.TextToUser(msg.FromUserName, "欢迎您扫描我们的二维码", Models.TokenOrTicket.GetAccessToken().access_token);
-                                    //}
-                                    //catch(Exception Ex)
-                                    //{
-                                    //    //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    //}
-                                    #endregion
-                                    break;
-                                case "LOCATION":
-                                    #region MyRegion
-                                    /*
-                                    try
-                                    {
-                                        var msg = XmlHelper.DeSerialize<ReceivedLOCATIONModel>(receivedPostString);
-                                        UserLocationModel location = new UserLocationModel()
-                                        {
-                                            FromUserName = msg.FromUserName,
-                                            Latitude = msg.Latitude,
-                                            Longitude = msg.Longitude,
-                                            Precision = msg.Precision,
-                                            Location_X = msg.Latitude,
-                                            Location_Y = msg.Longitude,
-                                            Scale = Convert.ToInt32(msg.Precision),
-                                            Label = string.Empty,
-                                            CreateTime = msg.CreateTime
-                                        };
-                                        CacheHelper.SetCache("1xuezhe_location_" + msg.FromUserName, location, 10);
-                                        
-                                        UserLocationModel LOCATIONCache = (UserLocationModel)CacheHelper.GetCache("1xuezhe_location_" + msg.FromUserName);
-                                        if(LOCATIONCache != null)
-                                        {
-                                            StringBuilder _msg = new StringBuilder();
-                                            _msg.AppendLine("您的当前地理位置信息：LOCATION");
-                                            _msg.AppendLine("纬度：" + LOCATIONCache.Latitude);
-                                            _msg.AppendLine("经度：" + LOCATIONCache.Longitude);
-                                            _msg.AppendLine("精度：" + LOCATIONCache.Precision);
-                                            _msg.AppendLine("Scale：" + LOCATIONCache.Scale);
-                                            _msg.AppendLine("FromUser：" + LOCATIONCache.FromUserName);
-                                            _msg.AppendLine("cachekey：" + "1xuezhe_location_" + msg.FromUserName);
-                                            SendMessage.TextToUser(LOCATIONCache.FromUserName, _msg.ToString(), Models.TokenOrTicket.GetAccessToken().access_token);
-                                        }
-                                        LogHelper.Save("ToUserName=" + msg.ToUserName + "    FromUserName=" + msg.FromUserName + "    Latitude=" + msg.Latitude + "    Longitude=" + msg.Longitude + "    Precision=" + msg.Precision + "    CreateTime=" + msg.CreateTime, "上报地理位置事件", LogType.Report, LogTime.day);
-                                        
-                                    }
-                                    catch(Exception Ex)
-                                    {
-                                        //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    }
-                                    */
-                                    #endregion
-                                    break;
-                                case "CLICK":
-                                    #region MyRegion
-                                    try
-                                    {
-                                        var msg = XmlHelper.DeSerialize<ReceivedClickModel>(receivedPostString);
-                                        //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，EventKey=" + msg.EventKey + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
-                                        Task.Factory.StartNew(() =>
-                                        {
-                                            AsyncManager.OutstandingOperations.Increment();
-                                            //Models.wxCustomHandler.ClickEventHandler(msg);
-                                            AsyncManager.OutstandingOperations.Decrement();
-
-                                            //AsyncManager.OutstandingOperations.Increment();
-                                            SendMsg.SendText(msg.FromUserName, "您点击了菜单，EventKey=" + msg.EventKey, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                            //AsyncManager.OutstandingOperations.Decrement();
-                                        });
-                                    }
-                                    catch(Exception Ex)
-                                    {
-                                        //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    }
-                                    #endregion
-                                    break;
-                                case "VIEW":
-                                    #region MyRegion
-                                    //try
-                                    //{
-                                    //    var msg = XmlHelper.DeSerialize<ReceivedViewModel>(receivedPostString);
-                                    //}
-                                    //catch(Exception Ex)
-                                    //{
-                                    //    //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    //}
-                                    #endregion
-                                    break;
-
-                                case "MASSSENDJOBFINISH":
-                                    #region MyRegion
-                                    try
-                                    {
-                                        var msg = XmlHelper.DeSerialize<ReceivedMassSensJobFinishModel>(receivedPostString);
-                                        //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
-                                        Task.Factory.StartNew(() =>
-                                        {
-                                            AsyncManager.OutstandingOperations.Increment();
-                                            SendMsg.SendText(administratorOpenID, Common.ConvertTime(msg.CreateTime) + Common.WeChatName + "收到事件推送群发结果：\r\n群发的结果：" + msg.Status + "\r\n粉丝数：" + msg.TotalCount + "\r\n准备发送的粉丝数：" + msg.FilterCount + "\r\n发送成功的粉丝数：" + msg.SentCount + "\r\n发送失败的粉丝数：" + msg.ErrorCount, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
-                                            AsyncManager.OutstandingOperations.Decrement();
-                                        });
-                                    }
-                                    catch(Exception Ex)
-                                    {
-                                        //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    }
-                                    #endregion
-                                    break;
-
-                                case "TEMPLATESENDJOBFINISH":
-                                    #region MyRegion
-                                    /*
-                                    try
-                                    {
-                                        var msg = XmlHelper.DeSerialize<ReceivedTemplateSensJobFinishModel>(receivedPostString);
-                                        //templatemessage templatemessage = BLLRepository.TemplatemessageBLL.GetModel((int)msg.MsgID, msg.ToUserName);
-                                        if(msg.Status == "success") //送达成功
-                                        {
-                                            //LogHelper.Save("送达成功    Status=" + msg.Status + "    MsgID=" + msg.MsgID + "    FromUserName=" + msg.FromUserName + "    ToUserName=" + msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" + msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送", WeiXinAPI.LogType.Report, WeiXinAPI.LogTime.day);
-                                            if(templatemessage != null && templatemessage.id > 0)
+                                            //log.Debug("Index >MsgType=" + msg.MsgType + "，Event=" + msg.Event + "，ToUserName=" + msg.ToUserName + "，FromUserName=" + msg.FromUserName + "，CreateTime=" + msg.CreateTime);
+                                            Task.Factory.StartNew(() =>
                                             {
-                                                templatemessage.status = msg.Status;
+                                                AsyncManager.OutstandingOperations.Increment();
+                                                SendMsg.SendText(administratorOpenID, TimestampHelper.ConvertTime(wx_CreateTime) + Common.WeChatName + "收到事件推送群发结果：\r\n群发的结果：" + xmlDoc.SelectSingleNode("xml/Status")?.InnerText + "\r\n粉丝数：" + xmlDoc.SelectSingleNode("xml/TotalCount")?.InnerText + "\r\n准备发送的粉丝数：" + xmlDoc.SelectSingleNode("xml/FilterCount")?.InnerText + "\r\n发送成功的粉丝数：" + xmlDoc.SelectSingleNode("xml/SentCount")?.InnerText + "\r\n发送失败的粉丝数：" + xmlDoc.SelectSingleNode("xml/ErrorCount")?.InnerText, Models.WeChatTokenOrTicket.GetAccessToken().access_token);
+                                                AsyncManager.OutstandingOperations.Decrement();
+                                            });
+                                        }
+                                        catch(Exception Ex)
+                                        {
+                                            //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
+                                        }
+                                        #endregion
+                                        break;
+
+                                    case "TEMPLATESENDJOBFINISH":
+                                        #region MyRegion
+                                        /*
+                                        try
+                                        {
+                                            var msg = XmlHelper.DeSerialize<ReceivedTemplateSensJobFinishModel>(receivedPostString);
+                                            //templatemessage templatemessage = BLLRepository.TemplatemessageBLL.GetModel((int)msg.MsgID, msg.ToUserName);
+                                            if(msg.Status == "success") //送达成功
+                                            {
+                                                //LogHelper.Save("送达成功    Status=" + msg.Status + "    MsgID=" + msg.MsgID + "    FromUserName=" + msg.FromUserName + "    ToUserName=" + msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" + msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送", WeiXinAPI.LogType.Report, WeiXinAPI.LogTime.day);
+                                                if(templatemessage != null && templatemessage.id > 0)
+                                                {
+                                                    templatemessage.status = msg.Status;
+                                                }
                                             }
-                                        }
-                                        else if(msg.Status == "failed:user block") //送达由于用户拒收（用户设置拒绝接收公众号消息）而失败
-                                        {
-                                            if(templatemessage != null && templatemessage.id > 0)
+                                            else if(msg.Status == "failed:user block") //送达由于用户拒收（用户设置拒绝接收公众号消息）而失败
                                             {
-                                                templatemessage.status = msg.Status;
+                                                if(templatemessage != null && templatemessage.id > 0)
+                                                {
+                                                    templatemessage.status = msg.Status;
+                                                }
+
+                                                SendMessage.TextToUser(administratorOpenID, "模版消息被用户拒收了。" + "\r\nMsgID=" + msg.MsgID + "\r\nFromUserName=" + msg.FromUserName + "\r\nCreateTime=" + Common.ConvertTime(msg.CreateTime), Models.TokenOrTicket.GetAccessToken().access_token);
+                                                LogHelper.Save("送达由于用户拒收    Status=" + msg.Status + "    MsgID=" + msg.MsgID + "    FromUserName=" + msg.FromUserName + "    ToUserName=" + msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" + msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送", LogType.Report, LogTime.day);
+                                            }
+                                            else if(msg.Status == "failed: system failed") //送达由于其他原因失败
+                                            {
+                                                if(templatemessage != null && templatemessage.id > 0)
+                                                {
+                                                    templatemessage.status = msg.Status;
+                                                }
+
+                                                LogHelper.Save("送达由于其他原因失败    Status=" + msg.Status + "    MsgID=" + msg.MsgID +"    FromUserName=" + msg.FromUserName + "    ToUserName=" +msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" +msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送",LogType.Report, LogTime.day);
+                                            }
+                                            else
+                                            {
+                                                if(templatemessage != null && templatemessage.id > 0)
+                                                {
+                                                    templatemessage.status = msg.Status;
+                                                }
+
+                                                LogHelper.Save("送达由于未知原因失败    Status=" + msg.Status + "    MsgID=" + msg.MsgID +"    FromUserName=" + msg.FromUserName + "    ToUserName=" +msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" +msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送",LogType.Report, LogTime.day);
                                             }
 
-                                            SendMessage.TextToUser(administratorOpenID, "模版消息被用户拒收了。" + "\r\nMsgID=" + msg.MsgID + "\r\nFromUserName=" + msg.FromUserName + "\r\nCreateTime=" + Common.ConvertTime(msg.CreateTime), Models.TokenOrTicket.GetAccessToken().access_token);
-                                            LogHelper.Save("送达由于用户拒收    Status=" + msg.Status + "    MsgID=" + msg.MsgID + "    FromUserName=" + msg.FromUserName + "    ToUserName=" + msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" + msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送", LogType.Report, LogTime.day);
-                                        }
-                                        else if(msg.Status == "failed: system failed") //送达由于其他原因失败
-                                        {
                                             if(templatemessage != null && templatemessage.id > 0)
                                             {
-                                                templatemessage.status = msg.Status;
+                                                templatemessage.eventname = msg.Event;
+                                                templatemessage.createtime = Common.ConvertTime(msg.CreateTime);
+
+                                                BLLRepository.TemplatemessageBLL.Update(templatemessage);
                                             }
-
-                                            LogHelper.Save("送达由于其他原因失败    Status=" + msg.Status + "    MsgID=" + msg.MsgID +"    FromUserName=" + msg.FromUserName + "    ToUserName=" +msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" +msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送",LogType.Report, LogTime.day);
                                         }
-                                        else
+                                        catch(Exception Ex)
                                         {
-                                            if(templatemessage != null && templatemessage.id > 0)
-                                            {
-                                                templatemessage.status = msg.Status;
-                                            }
-
-                                            LogHelper.Save("送达由于未知原因失败    Status=" + msg.Status + "    MsgID=" + msg.MsgID +"    FromUserName=" + msg.FromUserName + "    ToUserName=" +msg.ToUserName + "    MsgType=" + msg.MsgType + "    Event=" +msg.Event + "    CreateTime=" + msg.CreateTime, "模版消息发送任务完成后事件推送",LogType.Report, LogTime.day);
+                                            //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
                                         }
+                                        */
+                                        #endregion
+                                        break;
 
-                                        if(templatemessage != null && templatemessage.id > 0)
-                                        {
-                                            templatemessage.eventname = msg.Event;
-                                            templatemessage.createtime = Common.ConvertTime(msg.CreateTime);
+                                    default:
+                                        //log.Warn(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), new Exception("未识别的微信推送事件类型"));
+                                        break;
+                                }
+                                break;
+                            #endregion
 
-                                            BLLRepository.TemplatemessageBLL.Update(templatemessage);
-                                        }
-                                    }
-                                    catch(Exception Ex)
-                                    {
-                                        //log.Error(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), Ex);
-                                    }
-                                    */
-                                    #endregion
-                                    break;
-
-                                default:
-                                    //log.Warn(string.Format("Index > MsgType={0} > Event={1} > receivedPostString={2}", MsgType, Event, receivedPostString), new Exception("未识别的微信推送事件类型"));
-                                    break;
-                            }
-                            break;
-                        #endregion
-
-                        default:
-                            //log.Warn("Index > MsgType=" + MsgType + " receivedPostString=" + receivedPostString, new Exception("未识别的微信推送消息类型"));
-                            break;
+                            default:
+                                //log.Warn("Index > MsgType=" + MsgType + " receivedPostString=" + receivedPostString, new Exception("未识别的微信推送消息类型"));
+                                break;
+                        }
                     }
+                    else
+                    {
+                        //log.Error("Index > receivedPostString=" + receivedPostString, new Exception("微信推送消息receivedPostString异常"));
+                    }
+
+                    #endregion
+
+
                 }
-                else
-                {
-                    //log.Error("Index > receivedPostString=" + receivedPostString, new Exception("微信推送消息receivedPostString异常"));
-                }
+
             }
             else
             {
@@ -624,6 +698,7 @@ namespace SampleWebApp.Controllers
 
             return Content(PassiveReply.ReplyEmpty());
         }
+
 
         /// <summary>
         /// 维权通知

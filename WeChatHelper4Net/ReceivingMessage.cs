@@ -16,7 +16,12 @@ namespace WeChatHelper4Net
     {
         private ReceivingMessage() { }
 
-        public static string StreamToString(Stream stream)
+        /// <summary>
+        /// Stream转换为字符串（可以用于接收POST请求完整数据）
+        /// </summary>
+        /// <param name="stream">Request.InputStream</param>
+        /// <returns>返回：接收到POST请求完整数据字符串</returns>
+        public static string StreamToString(System.IO.Stream stream)
         {
             if (null != stream)
             {
@@ -26,6 +31,27 @@ namespace WeChatHelper4Net
             }
             return string.Empty;
         }
+
+        /// <summary>
+        /// 接收POST请求完整数据并转换为字符串
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns>返回：接收到POST请求完整数据字符串</returns>
+        public static string PostDataToString(System.Web.HttpRequestBase Request)
+        {
+            // 读取POST数据
+            using(System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream, Encoding.UTF8)) // HttpRequest.InputStream 是一次性的流:只能读取一次：一旦读取后，流的位置会到达末尾，再次读取将得不到数据
+            {
+                string postData = reader.ReadToEnd();
+                return postData;
+            }
+        }
+
+
+        //public static string DecryptWithAES(string xmlString, string EncodingAESKey)
+        //{
+
+        //}
 
         public static string GetMsgType(string xmlString)
         {

@@ -19,7 +19,7 @@ namespace WeChatHelper4Net.Models.JSSDK
         public string appId { get; set; }
 
         [DataMember(IsRequired = false)]
-        public int timestamp { get; set; }
+        public long timestamp { get; set; }
 
         [DataMember(IsRequired = false)]
         public string nonceStr { get; set; }

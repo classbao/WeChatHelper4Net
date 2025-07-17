@@ -31,7 +31,7 @@ namespace WeChatHelper4Net.Models.PassiveReply
 
         [DataMember(IsRequired = true)]
         [XmlElement(ElementName = nameof(CreateTime))]
-        public int CreateTime { get; set; }
+        public long CreateTime { get; set; }
 
         /// <summary>
         /// 构造函数内部将会初始化赋值

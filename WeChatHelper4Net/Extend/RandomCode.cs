@@ -24,24 +24,32 @@ namespace WeChatHelper4Net.Extend
         public static readonly Random random = new Random();
 
         /// <summary>
-        /// 字符串中连续相同的字符的个数
+        /// 最多连续字符数
         /// </summary>
-        /// <param name="text">字符串</param>
-        /// <returns>字符串中连续相同的字符的个数</returns>
-        public static int sameChar(string text)
+        /// <param name="input">目标字符串</param>
+        /// <returns></returns>
+        public static int MaximumOfConsecutiveCharacters(string input)
         {
-            if(!string.IsNullOrEmpty(text) && text.Length > 1)
+            if(string.IsNullOrEmpty(input))
+                return 0;
+
+            int maxCount = 1;
+            int currentCount = 1;
+
+            for(int i = 1; i < input.Length; i++)
             {
-                int flag = 0; //字符串中相同的字符数
-                char[] ArrChar = text.ToCharArray();
-                for(int i = 0; i < ArrChar.Length - 1; i++) //判断连续相同的字符（末尾字符不用判断）
+                if(input[i] == input[i - 1])
                 {
-                    if(ArrChar[i] == ArrChar[i + 1])
-                        flag++;
+                    currentCount++;
+                    maxCount = Math.Max(maxCount, currentCount);
                 }
-                return flag;
+                else
+                {
+                    currentCount = 1;
+                }
             }
-            return 0;
+
+            return maxCount;
         }
 
         /// <summary>
@@ -50,7 +58,7 @@ namespace WeChatHelper4Net.Extend
         /// <param name="length">随机代码长度</param>
         /// <param name="onlyUpper">英文字符仅大写</param>
         /// <returns>随机代码</returns>
-        public static string createRandomCode(int length, bool onlyUpper = true)
+        public static string GenerateRandomCode(int length, bool onlyUpper = true)
         {
             int range = 0;
             if(onlyUpper)
@@ -70,13 +78,38 @@ namespace WeChatHelper4Net.Extend
 
             if(length > 1 && !string.IsNullOrEmpty(code.ToString()))
             {
-                if(sameChar(code.ToString()) > length - 1) //至少有一个字符不相同
+                if(MaximumOfConsecutiveCharacters(code.ToString()) > length - 1) //至少有一个字符不相同
                 {
-                    return createRandomCode(length, onlyUpper);
+                    return GenerateRandomCode(length, onlyUpper);
                 }
             }
 
             return code.ToString();
         }
+
+        /// <summary>
+        /// 生成随机纯数字字符串
+        /// </summary>
+        /// <param name="length">长度</param>
+        /// <returns></returns>
+        public static string GenerateRandomNum(int length)
+        {
+            StringBuilder num = new StringBuilder();
+            for(int i = 0; i < length; i++)
+            {
+                num.Append(basechar[random.Next(0, 10)]);
+            }
+
+            if(length > 1 && !string.IsNullOrEmpty(num.ToString()))
+            {
+                if(MaximumOfConsecutiveCharacters(num.ToString()) > length - 1) //至少有一个字符不相同
+                {
+                    return GenerateRandomNum(length);
+                }
+            }
+
+            return num.ToString();
+        }
+
     }
 }

@@ -164,8 +164,8 @@ namespace WeChatHelper4Net
             Models.JSSDK.JSSDKConfig config = new Models.JSSDK.JSSDKConfig();
             config.appId = AppId;
             url = Common.CleanUrl(url); //移除url里面#及#后面的部分
-            config.timestamp = Common.ConvertTime(DateTime.Now);
-            config.nonceStr = RandomCode.createRandomCode(16, true); //生成16位随机字符串，数字，大写英文字母,小写英文字母
+            config.timestamp = TimestampHelper.ConvertTime(DateTime.Now);
+            config.nonceStr = RandomCode.GenerateRandomCode(16); //生成16位随机字符串，数字，大写英文字母,小写英文字母
 
             /*
 			 * 关于URL编码导致签名错误的问题：

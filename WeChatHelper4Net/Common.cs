@@ -52,9 +52,18 @@ namespace WeChatHelper4Net
         public static string AppId { get { return Privacy.AppId; } }
 
         /// <summary>
+        /// 自定义令牌(Token)，微信开发平台上面自己设置的
+        /// </summary>
+        public static string Token { get { return Privacy.Token; } }
+        /// <summary>
+        /// 消息加解密密钥 (EncodingAESKey)，消息加解密方式：安全模式
+        /// </summary>
+        public static string EncodingAESKey { get { return Privacy.EncodingAESKey; } }
+
+        /// <summary>
         /// 商户号（MCHID）
         /// </summary>
-        public static string PartnerID { get { return Privacy.PartnerID; } }
+        public static string WeChatPay_PartnerID { get { return Privacy.WeChatPay_PartnerID; } }
 
         /// <summary>
         /// 从微信官方获取微信公众号名片，简单快速获取微信公众号原始二维码（当用户未关注时打开关注页面）
@@ -135,36 +144,7 @@ namespace WeChatHelper4Net
             if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(pattern) || replacement == null) return string.Empty;
             return Regex.Replace(input, pattern, replacement, RegexOptions.IgnoreCase);
         }
-
-        #region 时间戳
-        /// <summary>
-        /// 时间戳转换为标准时间格式（基准时间为"1970-1-1 08:00:00"）
-        /// </summary>
-        /// <param name="TimeStamp">时间戳</param>
-        /// <returns>标准时间格式</returns>
-        public static DateTime ConvertTime(int TimeStamp)
-        {
-            TimeSpan ts = new TimeSpan(0, 0, 0, TimeStamp);
-            DateTime baseTime = Convert.ToDateTime("1970-1-1 08:00:00");
-            DateTime now = baseTime + ts;
-
-            return now;
-        }
-        /// <summary>
-        /// 标准时间格式转换为时间戳（基准时间为"1970-1-1 08:00:00"）
-        /// </summary>
-        /// <param name="time">标准时间格式</param>
-        /// <returns>时间戳</returns>
-        public static int ConvertTime(DateTime time)
-        {
-            //基准为"1970-1-1 08:00:00"时间转整数
-            DateTime baseTime = Convert.ToDateTime("1970-1-1 08:00:00");
-            TimeSpan ts = time - baseTime;
-            int TimeStamp = (int)ts.TotalSeconds;
-
-            return TimeStamp;
-        }
-        #endregion
+        
 
         #region Url编码与解码
         /// <summary>
