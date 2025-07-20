@@ -51,31 +51,31 @@ namespace WeChatHelper4Net.Extend
 			}
 			return UrlParameterString.ToString().Trim(new char[] { '&' });
 		}
-		#endregion
+        #endregion
 
-		/// <summary>
-		/// 字典转换XML字符串
-		/// </summary>
-		/// <param name="dictionarys">字典</param>
-		/// <param name="RootTag">根标签</param>
-		/// <returns>XML字符串</returns>
-		public static string ToXml(this Dictionary<string, string> dictionarys, string RootTag = "xml")
-		{
-			StringBuilder sb = new StringBuilder();
-			foreach (KeyValuePair<string, string> pair in dictionarys)
-			{
-				if (string.IsNullOrWhiteSpace(pair.Key) || string.IsNullOrWhiteSpace(pair.Value)) continue;
-				if (System.Text.RegularExpressions.Regex.IsMatch(pair.Value, "[<>&\'\"]+"))
-					sb.Append("<" + pair.Key + "><![CDATA[" + pair.Value + "]]></" + pair.Key + ">"); // 注：参数值用XML转义即可，CDATA标签用于说明数据不被XML解析器解析。
+        /// <summary>
+        /// 字典转换XML字符串
+        /// </summary>
+        /// <param name="dictionarys">字典</param>
+        /// <param name="RootTag">根标签</param>
+        /// <returns>XML字符串</returns>
+        public static string ToXml(this Dictionary<string, string> dictionarys, string RootTag = "xml")
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(KeyValuePair<string, string> pair in dictionarys)
+            {
+                if(string.IsNullOrWhiteSpace(pair.Key) || string.IsNullOrWhiteSpace(pair.Value)) continue;
+                if(System.Text.RegularExpressions.Regex.IsMatch(pair.Value, "[<>&\'\"]+"))
+                    sb.Append("<" + pair.Key + "><![CDATA[" + pair.Value + "]]></" + pair.Key + ">"); // 注：参数值用XML转义即可，CDATA标签用于说明数据不被XML解析器解析。
                 else
-					sb.Append("<" + pair.Key + ">" + pair.Value + "</" + pair.Key + ">");
-			}
+                    sb.Append("<" + pair.Key + ">" + pair.Value + "</" + pair.Key + ">");
+            }
 
-			if (string.IsNullOrWhiteSpace(RootTag))
-				return "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + sb.ToString();
-			else
-				return "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + "<" + RootTag + ">" + sb.ToString() + "</" + RootTag + ">";
-		}
+            if(string.IsNullOrWhiteSpace(RootTag))
+                return "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + sb.ToString();
+            else
+                return $"<?xml version=\"1.0\" encoding=\"utf-8\"?><{RootTag}>{sb.ToString()}</{RootTag}>";
+        }
 
 	}
 }

@@ -1,0 +1,40 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="MobileOptimized" content="240">
+    <meta name="applicable-device" content="mobile">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <title>高效生成QRCode二维码（示例页面）</title>
+
+</head>
+<body>
+
+    <!-- 简单二维码 -->
+    <img src="@Url.Action("Generate", "QRCode", new
+         {
+             content = Request.QueryString["c"] ?? "https://example.com",
+             size = Math.Min(Convert.ToInt32(Request.QueryString["size"] ?? "1000"), 250),
+             foreground = Request.QueryString["foreground"] ?? "FF5722",
+             background = Request.QueryString["background"] ?? "F5F5F5"
+         })" alt="QR Code" />
+
+    <!-- 带图标的二维码 (需要表单上传) -->
+    @using(Html.BeginForm("GenerateWithIcon", "QRCode", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="text" name="content" placeholder="二维码内容（必填）" />
+        <input type="number" name="size" value="300" />
+        <input type="file" name="icon" accept="image/*" />
+        <button type="submit">生成带图标的二维码</button>
+    }
+
+</body>
+</html>
