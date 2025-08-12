@@ -73,7 +73,7 @@ namespace SampleWebApp.DB
             bill.bill_bill_mtime = WeChatHelper4Net.Extend.TimestampHelper.ConvertTime(DateTime.Now);
 
             // 基础更新SQL
-            var sql = "UPDATE t_bill SET bill_return_code=@bill_return_code,bill_result_code=@bill_result_code,bill_err_code=@bill_err_code,bill_notify_total_fee=@bill_notify_total_fee,bill_notify_fee_type=@bill_notify_fee_type,bill_notify_time_end=@bill_notify_time_end,bill_notify_transaction_id=@bill_notify_transaction_id,bill_notifytime=@bill_notifytime,@bill_bill_mtime WHERE bill_ID = @bill_ID;";
+            var sql = "UPDATE t_bill SET bill_return_code=@bill_return_code,bill_result_code=@bill_result_code,bill_err_code=@bill_err_code,bill_notify_total_fee=@bill_notify_total_fee,bill_notify_fee_type=@bill_notify_fee_type,bill_notify_time_end=@bill_notify_time_end,bill_notify_transaction_id=@bill_notify_transaction_id,bill_notifytime=@bill_notifytime,bill_bill_mtime=@bill_bill_mtime WHERE bill_ID = @bill_ID;";
             int rowsAffected = DapperHelper.Execute(sql, bill);
 
             return rowsAffected;
